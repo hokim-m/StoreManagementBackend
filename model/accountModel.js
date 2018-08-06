@@ -6,8 +6,34 @@ function AccountModel() {
 
 }
 
-AccountModel.prototype.parseXLSX = function () {
+AccountModel.prototype.parseXLSX = function (binary) {
+        return new Promise((resolve, reject) => {
+                let xlsx               = require('xlsx');
+                const workbook         = xlsx.read(binary, {type: 'binary'});
+                const first_sheet_name = workbook.SheetNames[0];
+                const worksheet        = workbook.Sheets[first_sheet_name];
+                let promises           = [];
 
+                let current_row = 2;
+                while (!!worksheet['A' + current_row]) {
+                        let account = {};
+                        // account.oe     = worksheet['A' + current_row].v;
+                        account.oemNumber   = worksheet['B' + current_row].v;
+                        account.modelName   = worksheet['C' + current_row].v;
+                        account.name        = worksheet['D' + current_row].v;
+                        account.unit        = worksheet['E' + current_row].v;
+                        account.description = worksheet['F' + current_row].v;
+                        promises.push(this.addAccount(account));
+
+                        current_row++;
+                }
+
+                Promise.all(promises).then(data => {
+                        resolve(data);
+                }).catch(err => {
+                        reject(err);
+                });
+        });
 };
 
 AccountModel.prototype.addAccount    = function (accountObject) {
