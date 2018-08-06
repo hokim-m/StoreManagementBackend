@@ -2,6 +2,7 @@ let express = require('express');
 let router  = express.Router();
 const UsersCollection = require('../model/schemas/user');
 const Response = require('../views/response');
+const ObjectId = require('mongoose').Schema.Types.ObjectId;
 
 
 /* GET users listing. */
@@ -27,7 +28,21 @@ router.post('/add', function (req, res) {
         })
 
 });
-
+router.get('/remove/:id', function (req, res) {
+        let userId = req.params.id;
+        try {
+                let obj = ObjectId(userId);
+        } catch (e) {
+                Response.ErrorWithCodeAndMessage(res, -1, "Incorrect ObjectId passed as user id");
+        }
+        UsersCollection.remove({_id: ObjectId(userId)}, function (err, result) {
+                if (!err) {
+                        Response.setData(res, result);
+                } else {
+                        Response.UNHANDLED_ERROR(res);
+                }
+        })
+});
 router.get('/list', function (req, res) {
         UsersCollection.aggregate([
                 {
