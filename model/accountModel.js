@@ -86,9 +86,9 @@ AccountModel.prototype.updateAccount = function (accountId, accountObject) {
                 });
         });
 };
-AccountModel.prototype.balance       = function (query) {
+AccountModel.prototype.balance       = function (query = {}) {
         return new Promise((resolve, reject) => {
-                AccountsCollection.find({}, function (err, accounts) {
+                AccountsCollection.find(query, function (err, accounts) {
                         if (!err) {
                                 resolve(accounts);
                         } else {
@@ -100,8 +100,9 @@ AccountModel.prototype.balance       = function (query) {
 };
 
 AccountModel.prototype.soldBalance = function (query) {
+        query.count = 0;
         return new Promise((resolve, reject) => {
-                AccountsCollection.find({count: 0}, function (err, accounts) {
+                AccountsCollection.find(query, function (err, accounts) {
                         if (!err) {
                                 resolve(accounts);
                         } else {
