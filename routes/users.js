@@ -28,4 +28,23 @@ router.post('/add', function (req, res) {
 
 });
 
+router.get('/list', function (req, res) {
+        UsersCollection.aggregate([
+                {
+                        $project: {
+                                _id: 1,
+                                login: 1,
+                                name: 1,
+                                group: 1
+                        }
+                }
+        ], function (err, result) {
+                if (!err) {
+                        Response.setData(res, result);
+                } else {
+                        Response.UNHANDLED_ERROR(res);
+                }
+        })
+});
+
 module.exports = router;
