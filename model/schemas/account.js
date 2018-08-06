@@ -4,9 +4,12 @@ const Schema   = mongoose.Schema;
 let AccountSchema = new Schema({
         name: String,
         count: Number,
+        group: String,
+        description: String,
+        imageLink: String,
         unit: String,
-        comment: String,
         source: String,
+        price: String,
         oemNumber: String,
         modelName: String
 
