@@ -1,6 +1,6 @@
 const Promise         = require('bluebird');
 const StoreCollection = require('./schemas/store');
-const ObjectId        = require('mongoose').Schema.Types.ObjectId;
+const ObjectId        = require('mongoose').Types.ObjectId;
 
 function StoreModel() {
 

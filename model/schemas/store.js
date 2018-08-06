@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const ObjectId = Schema.ObjectId;
+const ObjectId = Schema.Types.ObjectId;
 let StoreSchema = new Schema({
         title: String,
         group: String, //main, sub

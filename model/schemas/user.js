@@ -5,6 +5,7 @@ let UserSchema = new Schema({
         login: String,
         name: String,
         group: Number,
+        store: Schema.Types.ObjectId,
         hash: String
 }, {
         versionKey: false
