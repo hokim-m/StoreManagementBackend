@@ -51,6 +51,12 @@ Response.prototype.pFillResponse     = function (res = null, data = null, code =
 
         res.send(response);
 };
+/**
+ *
+ * @param res {Response} Express JS res method
+ * @param code {Number}
+ * @param message {Object}
+ */
 Response.prototype.ErrorWithCodeAndMessage = function (res, code, message) {
         let response = {};
         response.meta = {
