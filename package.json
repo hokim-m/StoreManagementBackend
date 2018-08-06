@@ -1,0 +1,21 @@
+{
+  "name": "storemanagementbackend",
+  "version": "0.0.0",
+  "author": "Khokim Mamarasulov <hokim.m>",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.16.0",
+    "http-errors": "~1.6.2",
+  },
+  "devDependencies": {
+    "bluebird": "^3.5.1",
+    "cors": "^2.8.4",
+    "mongoose": "^5.2.6",
+    "xlsx": "^0.13.3"
+  }
+}
