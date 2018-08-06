@@ -24,6 +24,16 @@ router.post('/add', function (req, res) {
         });
 });
 
+router.post('/parse-xlsx', function (req, res) {
+        const file = req.body.file;
+        const fileName = req.body.name;
+        AccountModel.parseXLSX(file).then(data=> {
+                Response.setData(res, data);
+        }).catch(err=> {
+                Response.ErrorWithCodeAndMessage(res, -1, err);
+        });
+});
+
 router.post('/sell/:id', function (req, res) {
         let accountId = req.params.id;
         let account = req.body;
