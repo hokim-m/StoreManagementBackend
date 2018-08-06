@@ -11,6 +11,7 @@ let AccountSchema = new Schema({
         source: String,
         price: String,
         oemNumber: String,
+        createdTimestamp: Number,
         timestamp: Number,
         modelName: String
 
