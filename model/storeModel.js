@@ -15,7 +15,7 @@ StoreModel.prototype.add    = function (storeObject) {
                         storeObject.parent = ObjectId(storeObject.parent);
                 }
                 let store = new StoreCollection(storeObject);
-
+                store.timestamp = (new Date()).getTime();
                 store.save((err, onSave) => {
                         if (!err) {
                                 if (onSave.parent) {
