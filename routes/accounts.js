@@ -24,6 +24,15 @@ router.post('/add', function (req, res) {
         });
 });
 
+router.post('/update', function (req, res) {
+        let body = req.body;
+        AccountModel.updateAccount(body.accountId, body.account).then(data=> {
+                Response.setData(res, data);
+        }).catch(err=> {
+                Response.UNHANDLED_ERROR(res);
+        })
+});
+
 router.post('/parse-xlsx', function (req, res) {
         const file = req.body.file;
         const fileName = req.body.name;
