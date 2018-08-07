@@ -7,10 +7,10 @@ let indexRouter = require('./routes/index');
 let usersRouter = require('./routes/users');
 
 let app        = express();
-const mongoose = require('mongoose').then(data => {
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/binary-store-backend').then(data => {
         console.log('connected to mongo db');
 });
-mongoose.connect('mongodb://localhost:27017/binary-store-backend');
 
 // view engine setup
 app.use(express.json());
