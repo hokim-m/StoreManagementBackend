@@ -3,13 +3,50 @@ let router            = express.Router();
 const UsersCollection = require('../model/schemas/user');
 const Response        = require('../views/response');
 const ObjectId        = require('mongoose').Schema.Types.ObjectId;
+/**
+ * @api {post} /users/add  Add User
+ * @apiName AddUser
+ * @apiGroup Users
 
-
-/* GET users listing. */
-router.get('/', function (req, res, next) {
-        res.send('respond with a resource');
-});
-
+ * @apiParam {String} login             User login
+ * @apiParam {String} name              User name info
+ * @apiParam {Number} group             Group info
+ * @apiParam {String} hash              SHA256 string. Creation: sha256(login + password)
+ * @apiParam {String} store             Store ID
+ *
+ * @apiSuccess {Object} data Stored user data in DB.
+ * @apiSuccess {Object} meta Common response message.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "data": {User},
+ *       "meta": {
+ *              "code": 0,
+ *              "message": "OK"
+ *       }
+ *     }
+ *
+ * @apiUse UNHANDLED_ERROR
+ * @apiError UserHashError
+ * @apiErrorExample UserHashError:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Field `hash`  is mandatory"
+ *       }
+ *     }
+ * @apiError UserLoginError
+ * @apiErrorExample UserLoginError:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Field `login`  is mandatory"
+ *       }
+ *     }
+ */
 router.post('/add', function (req, res) {
         let body = req.body;
         if (!body.hash) {
@@ -28,6 +65,47 @@ router.post('/add', function (req, res) {
         });
 
 });
+/**
+ * @api {post} /users/edit  Edit User
+ * @apiName EditUser
+ * @apiGroup Users
+
+ * @apiParam {String} userId             User id
+ * @apiParam {Object} user              Updating user info
+ *
+ * @apiSuccess {Object} data Updating result.
+ * @apiSuccess {Object} meta Common response message.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "data": {User},
+ *       "meta": {
+ *              "code": 0,
+ *              "message": "OK"
+ *       }
+ *     }
+ *
+ * @apiUse UNHANDLED_ERROR
+ * @apiError UserUpdatingPropertyError
+ * @apiErrorExample UserUpdatingPropertyError:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Field `user`  is mandatory"
+ *       }
+ *     }
+ * @apiError UserUpdatingIDError
+ * @apiErrorExample UserUpdatingIDError:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Field `userId`  is mandatory"
+ *       }
+ *     }
+ */
 router.post('/update', function (req, res) {
         const userId       = req.body.userId;
         const user         = req.body.user;
@@ -52,6 +130,36 @@ router.post('/update', function (req, res) {
         })
 
 });
+/**
+ * @api {get} /users/remove/:id  Remove User
+ * @apiName RemoveUser
+ * @apiGroup Users
+
+ * @apiParam {String} userId             User id
+ *
+ * @apiSuccess {Object} data Updating result.
+ * @apiSuccess {Object} meta Common response message.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "data": {User},
+ *       "meta": {
+ *              "code": 0,
+ *              "message": "OK"
+ *       }
+ *     }
+ *
+ * @apiError UserUpdatingIDError
+ * @apiErrorExample UserUpdatingIDError:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Field `userId`  is mandatory"
+ *       }
+ *     }
+ */
 router.get('/remove/:id', function (req, res) {
         let userId = req.params.id;
         try {
@@ -67,6 +175,30 @@ router.get('/remove/:id', function (req, res) {
                 }
         });
 });
+/**
+ * @api {get} /users/list  Users List
+ * @apiName UsersList
+ * @apiGroup Users
+
+ * @apiSuccess {Array} data Array of user list
+ * @apiSuccess {Object} meta Common response message.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "data": [{
+ *              "_id": String
+ *              "name": String,
+ *              "group": Number,
+ *              "login": String
+ *       }],
+ *       "meta": {
+ *              "code": 0,
+ *              "message": "OK"
+ *       }
+ *     }
+ *
+ */
 router.get('/list', function (req, res) {
         UsersCollection.aggregate([
                 {
