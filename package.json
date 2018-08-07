@@ -6,7 +6,7 @@
   "apidoc": {
     "name": "Store Management API",
     "title": "Store Management Backend API",
-    "url" : "https://api.host.com/",
+    "url" : "https://api.host.com",
     "description": "API Docs for store management project",
     "header": {
       "title": "Docs"

@@ -146,7 +146,12 @@ router.post('/remove', function (req, res) {
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
  *     {
- *       "data": [{Account}, {Account}],
+ *       "data": [{
+ *              sub: [],
+ *              title: String,
+ *              description: String,
+ *              timestamp: Number,
+ *              }],
  *       "meta": {
  *              "code": 0,
  *              "message": "OK"
