@@ -27,6 +27,12 @@ app.use('/v1/documentation', function (req, res) {
         let absPath = path.join(__dirname, './apidocs/index.html');
         res.sendFile(absPath);
 });
+app.use('/v1/', function (req, res) {
+        let pathName = req.path;
+        let absPath = path.join(__dirname, './apidocs/' + pathName);
+
+        res.sendFile(absPath);
+});
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
         Response.TERMINATE_SESSION(res);
