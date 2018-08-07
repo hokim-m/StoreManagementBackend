@@ -4,7 +4,8 @@ const ObjectId = Schema.Types.ObjectId;
 let StoreSchema = new Schema({
         title: String,
         description: String,
-        parent: ObjectId,
+        parent: {type: ObjectId, ref: 'store'},
+        sub: [{type: ObjectId, ref: 'store'}],
         timestamp: Number
 }, {
         versionKey: false

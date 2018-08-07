@@ -14,8 +14,8 @@ router.post('/add', function (req, res) {
 });
 
 router.post('/edit', function (req, res) {
-        const story   = req.body.story;
-        const storyID = req.body.storyID;
+        const story   = req.body.store;
+        const storyID = req.body.storeID;
         StoreModel.edit(storyID, story).then(data => {
                 Response.setData(res, data);
         }).catch(err => {
@@ -24,8 +24,8 @@ router.post('/edit', function (req, res) {
 });
 
 router.post('/remove', function (req, res) {
-        const storyID = req.body.storyID;
-        StoreModel.remove(storyID).then(data => {
+        const storeID = req.body.storeID;
+        StoreModel.remove(storeID).then(data => {
                 Response.setData(res, data);
         }).catch(err => {
                 Response.ErrorWithCodeAndMessage(res, -1, err);

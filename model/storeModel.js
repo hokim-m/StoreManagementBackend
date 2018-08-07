@@ -6,7 +6,7 @@ function StoreModel() {
 
 }
 
-StoreModel.prototype.add = function (storeObject) {
+StoreModel.prototype.add    = function (storeObject) {
         return new Promise((resolve, reject) => {
                 if (!storeObject.title) {
                         return reject('property `title` is required!');
@@ -18,15 +18,48 @@ StoreModel.prototype.add = function (storeObject) {
 
                 store.save((err, onSave) => {
                         if (!err) {
-                                resolve(onSave);
+                                if (onSave.parent) {
+                                        this.addSub(onSave.parent, onSave).then(data=> {
+                                                resolve(data);
+                                        }).catch(err=> {
+                                                reject(err);
+                                        });
+                                } else {
+                                        resolve(onSave);
+                                }
+
                         } else {
                                 reject(err);
                         }
                 });
         });
 };
-
-StoreModel.prototype.edit = function (storeId, storeObject) {
+StoreModel.prototype.addSub = function (parentId, store) {
+        return new Promise((resolve, reject) => {
+                StoreCollection.update({
+                        _id: parentId
+                }, {$push: {sub: store._id}}, function (err, result) {
+                        if (!err) {
+                                resolve(result);
+                        } else {
+                                reject(err);
+                        }
+                });
+        });
+};
+StoreModel.prototype.removeFromSub = function (store) {
+        return new Promise((resolve, reject) => {
+                StoreCollection.update({
+                }, {$pull: {sub: store._id}}, function (err, result) {
+                        if (!err) {
+                                resolve(result);
+                        } else {
+                                reject(err);
+                        }
+                });
+        });
+};
+StoreModel.prototype.edit   = function (storeId, storeObject) {
         return new Promise((resolve, reject) => {
                 let updatingKeys = {$set: {}};
                 Object.keys(storeObject).map(key => {
@@ -35,6 +68,8 @@ StoreModel.prototype.edit = function (storeId, storeObject) {
                 StoreCollection.update({
                         _id: ObjectId(storeId)
                 }, updatingKeys, function (err, result) {
+                        console.log(err);
+                        console.log(result);
                         if (!err) {
                                 resolve(result);
                         } else {
@@ -52,8 +87,9 @@ StoreModel.prototype.remove = function (storeId) {
                         reject('Incorrect ObjectId representation');
                 }
 
-                StoreCollection.remove({_id: ObjectId(storeId)}, function (err, result) {
+                StoreCollection.remove({_id: ObjectId(storeId)}, (err, result)=> {
                         if (!err) {
+                                this.removeFromSub({_id: ObjectId(storeId)});
                                 resolve(result);
                         } else {
                                 reject(err);
@@ -64,13 +100,15 @@ StoreModel.prototype.remove = function (storeId) {
 
 StoreModel.prototype.list = function () {
         return new Promise((resolve, reject) => {
-                StoreCollection.find({}, function (err, list) {
-                        if (!err) {
-                                resolve(list);
-                        } else {
-                                reject(err);
-                        }
-                })
+                StoreCollection.find({parent: null})
+                    .populate('sub')
+                    .exec(function (err, result) {
+                            if (!err) {
+                                    resolve(result);
+                            } else {
+                                    reject(err);
+                            }
+                    });
         });
 };
 
