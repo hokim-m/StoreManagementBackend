@@ -11,7 +11,11 @@ StoreModel.prototype.add = function (storeObject) {
                 if (!storeObject.title) {
                         return reject('property `title` is required!');
                 }
+                if (storeObject.parent) {
+                        storeObject.parent = ObjectId(storeObject.parent);
+                }
                 let store = new StoreCollection(storeObject);
+
                 store.save((err, onSave) => {
                         if (!err) {
                                 resolve(onSave);

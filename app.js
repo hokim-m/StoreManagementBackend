@@ -3,9 +3,11 @@ let express      = require('express');
 let path         = require('path');
 let cookieParser = require('cookie-parser');
 const Response = require('./views/response');
+
 let indexRouter = require('./routes/index');
 let usersRouter = require('./routes/users');
 let accountsRouter = require('./routes/accounts');
+let storeRouter = require('./routes/store');
 
 let app        = express();
 const mongoose = require('mongoose');
@@ -22,6 +24,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/accounts', accountsRouter);
+app.use('/store', storeRouter);
+
 app.use('/v1/documentation', function (req, res) {
         let path = require('path');
         let absPath = path.join(__dirname, './apidocs/index.html');

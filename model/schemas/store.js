@@ -3,7 +3,6 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 let StoreSchema = new Schema({
         title: String,
-        group: String, //main, sub
         description: String,
         parent: ObjectId,
         timestamp: Number
