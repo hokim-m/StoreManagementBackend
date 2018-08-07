@@ -22,6 +22,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/accounts', accountsRouter);
+app.use('/v1/documentation', function (req, res) {
+        let path = require('path');
+        let absPath = path.join(__dirname, './apidocs/index.html');
+        res.sendFile(absPath);
+});
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
         Response.TERMINATE_SESSION(res);
