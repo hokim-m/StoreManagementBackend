@@ -19,7 +19,7 @@ let router = express.Router();
  */
 
 /**
- * @api {get} /accounts/balance/ :id Request Account Balance
+ * @api {get} /accounts/balance/:id  Account Balance
  * @apiName GetBalance
  * @apiGroup Accounts
  *
@@ -40,6 +40,14 @@ let router = express.Router();
  *
  * @apiUse UNHANDLED_ERROR
  * @apiError IDNotFound The <code>id</code> of the Store is mandatory.
+ * @apiErrorExample IDNotFound:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "The `id` of the Store is mandatory"
+ *       }
+ *     }
  */
 router.get('/balance/:id', function (req, res) {
              let id = req.params.id;
@@ -52,7 +60,7 @@ router.get('/balance/:id', function (req, res) {
              })
 });
 /**
- * @api {post} /accounts/add/  Request Add Account
+ * @api {post} /accounts/add/  Add Account
  * @apiName AddAccount
  * @apiGroup Accounts
 
@@ -64,7 +72,7 @@ router.get('/balance/:id', function (req, res) {
  * @apiParam {String} oemNumber         Account's O.E.M number
  * @apiParam {String} modelName         Account model name
  * @apiParam {Number} price             Price
- * @apiParam {Number} [count=1]         Count for account. Default 0
+ * @apiParam {Number} [count=1]         Count for account.
  *
  * @apiSuccess {Object} data Stored account data in DB.
  * @apiSuccess {Object} meta Common response message.
@@ -112,6 +120,14 @@ router.post('/add', function (req, res) {
  *
  * @apiUse UNHANDLED_ERROR
  * @apiError UpdateAccountIDError Field <code>accountID</code> is mandatory
+ * @apiErrorExample UpdateAccountIDError:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Field `accountID`  is mandatory"
+ *       }
+ *     }
  */
 router.post('/update', function (req, res) {
         let body = req.body;
@@ -147,7 +163,23 @@ router.post('/update', function (req, res) {
  *
  * @apiUse UNHANDLED_ERROR
  * @apiError ParseXLSXFileError Field <code>file</code> is mandatory. Either base64 string content corrupted
+ * @apiErrorExample ParseXLSXFileError:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Field `file`  is mandatory. Either base64 string content corrupted"
+ *       }
+ *     }
  * @apiError ParseXLSXFileNameError Field<code>name</code> is mandatory.
+ * @apiErrorExample ParseXLSXFileNameError:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Field `name`  is mandatory."
+ *       }
+ *     }
  */
 router.post('/parse-xlsx', function (req, res) {
         const file = req.body.file;
@@ -187,6 +219,14 @@ router.post('/parse-xlsx', function (req, res) {
  *
  * @apiUse UNHANDLED_ERROR
  * @apiError SellAccountIDError Request param <code>:id</code> is mandatory
+ * @apiErrorExample SellAccountIDError:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Request param `id`  is mandatory."
+ *       }
+ *     }
  */
 router.post('/sell/:id', function (req, res) {
         let accountId = req.params.id;
@@ -221,8 +261,32 @@ router.post('/sell/:id', function (req, res) {
  *
  * @apiUse UNHANDLED_ERROR
  * @apiError GetSaleReportsStoreID Request param <code>:id</code> is mandatory
+ * @apiErrorExample GetSaleReportsStoreID:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Request param `id`  is mandatory."
+ *       }
+ *     }
  * @apiError GetSaleReportsFromTimestamp Request param <code>:from</code> is mandatory
+ * @apiErrorExample GetSaleReportsFromTimestamp:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Request param `from`  is mandatory."
+ *       }
+ *     }
  * @apiError GetSaleReportsToTimestamp Request param <code>:to</code> is mandatory
+ * @apiErrorExample GetSaleReportsToTimestamp:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Request param `to`  is mandatory."
+ *       }
+ *     }
  */
 router.get('/reports/:id/:from/:to', function (req, res) {
         let from = req.params.from;

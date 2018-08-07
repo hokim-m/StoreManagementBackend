@@ -3,6 +3,18 @@
   "version": "0.1.0",
   "author": "Khokim Mamarasulov <hokim.m>",
   "private": true,
+  "apidoc": {
+    "name": "Binary Store Management API",
+    "title": "Binary Store Management Backend API",
+    "url" : "https://api.binary.com/",
+    "description": "API Docs for store management project",
+    "footer": {
+      "title": "Hokim Mamarasulov"
+    },
+    "header": {
+      "title": "Docs"
+    }
+  },
   "scripts": {
     "start": "node ./bin/www"
   },
