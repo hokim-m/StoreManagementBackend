@@ -37,7 +37,7 @@ AccountModel.prototype.parseXLSX = function (binary) {
 };
 
 AccountModel.prototype.addAccount    = function (accountObject) {
-        return new Promise((reject, resolve) => {
+        return new Promise((resolve, reject) => {
                 let account = new AccountsCollection(accountObject);
                 account.save((err, onSave) => {
                         if (!err) {

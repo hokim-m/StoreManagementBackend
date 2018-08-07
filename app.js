@@ -2,9 +2,10 @@ let createError  = require('http-errors');
 let express      = require('express');
 let path         = require('path');
 let cookieParser = require('cookie-parser');
-
+const Response = require('./views/response');
 let indexRouter = require('./routes/index');
 let usersRouter = require('./routes/users');
+let accountsRouter = require('./routes/accounts');
 
 let app        = express();
 const mongoose = require('mongoose');
@@ -20,21 +21,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
+app.use('/accounts', accountsRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-        next(createError(404));
+        Response.TERMINATE_SESSION(res);
 });
 
 // error handler
 app.use(function (err, req, res, next) {
-        // set locals, only providing error in development
-        res.locals.message = err.message;
-        res.locals.error   = req.app.get('env') === 'development' ? err : {};
-
-        // render the error page
-        res.status(err.status || 500);
-        res.render('error');
+        Response.ErrorWithCodeAndMessage(res, -1, err.message);
 });
 
 module.exports = app;

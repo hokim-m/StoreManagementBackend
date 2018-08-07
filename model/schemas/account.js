@@ -13,7 +13,7 @@ let AccountSchema = new Schema({
         oemNumber: String,
         createdTimestamp: Number,
         timestamp: Number,
-        modelName: String
+        model: String
 
 }, {
         versionKey: false
