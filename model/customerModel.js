@@ -9,6 +9,9 @@ function CustomerModel() {
 
 CustomerModel.prototype.add = function (customer) {
         return new Promise((resolve, reject)=> {
+                if (!customer.name) {
+                     return reject("Property `name` is required");
+                }
                 customer.timestamp = (new Date()).getTime();
                 let customerObj = new CustomersCollection(customer);
                 customerObj.save((err, onSave)=> {
@@ -20,6 +23,12 @@ CustomerModel.prototype.add = function (customer) {
 
 CustomerModel.prototype.edit = function (customerID, customer) {
         return new Promise((resolve, reject)=> {
+                if (!customerID) {
+                        return reject("Property `customerId` is required");
+                }
+                if (!customer) {
+                        return reject("Property `customer` is required");
+                }
                 let updatingObj = {$set: {}};
                 Object.keys(customer).map(key=> {
                         updatingObj['$set'][key] = customer[key];
@@ -35,6 +44,9 @@ CustomerModel.prototype.edit = function (customerID, customer) {
 
 CustomerModel.prototype.remove = function (customerID) {
         return new Promise((resolve, reject)=> {
+                if (!customerID) {
+                        return reject("Property customerId is required!");
+                }
                 CustomersCollection.remove({_id: ObjectId(customerID)}, function (err, result) {
                         if (!err) resolve(result);
                         else reject(err);
