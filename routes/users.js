@@ -65,6 +65,28 @@ router.post('/add', function (req, res) {
         });
 
 });
+/**
+ * @api {post} /users/login  Authorize User
+ * @apiName AuthUser
+ * @apiGroup Users
+
+ * @apiParam {String} login             User login
+ * @apiParam {String} hash              SHA256 string. Creation: sha256(login + password)
+ *
+ * @apiSuccess {Boolean} data Boolean indicating whether auth or not. (true -- success, false -- not success :) )
+ * @apiSuccess {Object} meta Common response message.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "data": {Boolean},
+ *       "meta": {
+ *              "code": 0,
+ *              "message": "OK"
+ *       }
+ *     }
+ *
+ */
 router.post('/login', function (req, res) {
         const login = req.body.login;
         const hash = req.body.hash;
