@@ -1,4 +1,5 @@
-const router     = require('express').Router();
+let express           = require('express');
+let router            = express.Router();
 const Promise    = require('bluebird');
 const Response   = require('../views/response');
 const StoreModel = require('../model/storeModel');
@@ -38,6 +39,7 @@ const StoreModel = require('../model/storeModel');
  */
 
 router.post('/add', function (req, res) {
+        console.log("hello");
         const body = req.body;
         StoreModel.add(body).then(data => {
                 Response.setData(res, data);
