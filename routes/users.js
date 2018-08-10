@@ -2,7 +2,7 @@ let express           = require('express');
 let router            = express.Router();
 const UsersCollection = require('../model/schemas/user');
 const Response        = require('../views/response');
-const ObjectId        = require('mongoose').Schema.Types.ObjectId;
+const ObjectId        = require('mongoose').Types.ObjectId;
 /**
  * @api {post} /users/add  Add User
  * @apiName AddUser
@@ -121,7 +121,7 @@ router.post('/update', function (req, res) {
                 updatingParams['$set'][key] = user[key];
         });
 
-        UsersCollection.update({_id: ObjectId}, updatingParams, function (err, result) {
+        UsersCollection.update({_id: ObjectId(userId)}, updatingParams, function (err, result) {
                 if (!err) {
                         Response.setData(res, result);
                 } else {
@@ -206,7 +206,8 @@ router.get('/list', function (req, res) {
                                 _id: 1,
                                 login: 1,
                                 name: 1,
-                                group: 1
+                                group: 1,
+                                store: 1
                         }
                 }
         ], function (err, result) {
