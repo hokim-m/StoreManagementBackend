@@ -65,6 +65,18 @@ router.post('/add', function (req, res) {
         });
 
 });
+router.post('/login', function (req, res) {
+        const login = req.body.login;
+        const hash = req.body.hash;
+        UsersCollection.find({login, hash}, function (err, result) {
+                if (!err) {
+                        let found = result.length > 0;
+                        Response.setData(res, found);
+                } else {
+                        Response.ErrorWithCodeAndMessage(res, -1, err);
+                }
+        })
+});
 /**
  * @api {post} /users/edit  Edit User
  * @apiName EditUser
