@@ -6,7 +6,7 @@
   "apidoc": {
     "name": "Store Management API",
     "title": "Store Management Backend API",
-    "url" : "https://api.host.com",
+    "url": "https://api.host.com",
     "description": "API Docs for store management project",
     "header": {
       "title": "Docs"
@@ -16,12 +16,12 @@
     "start": "node ./bin/www"
   },
   "devDependencies": {
+    "bluebird": "^3.5.1",
     "cookie-parser": "~1.4.3",
+    "cors": "^2.8.4",
     "debug": "~2.6.9",
     "express": "~4.16.0",
     "http-errors": "~1.6.2",
-    "bluebird": "^3.5.1",
-    "cors": "^2.8.4",
     "mongoose": "^5.2.6",
     "xlsx": "^0.13.3"
   }

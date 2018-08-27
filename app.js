@@ -10,6 +10,8 @@ let storeRouter = require('./routes/store');
 let customerRouter = require('./routes/customers');
 
 let app        = express();
+const cors = require('cors');
+app.use(cors());
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/binary-store-backend').then(data => {
         console.log('connected to mongo db');
