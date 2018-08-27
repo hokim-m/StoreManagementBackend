@@ -66,6 +66,7 @@ router.get('/balance/:id', function (req, res) {
 
  * @apiParam {String} name              Title to represent account
  * @apiParam {String} group             Group identifier for account
+ * @apiParam {String} store             Store ObjectId hex string representation
  * @apiParam {String} [description]     Account description
  * @apiParam {String} unit              Unit for account. kg|
  * @apiParam {String} [source=Admin]    Who is adding new account

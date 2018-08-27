@@ -38,6 +38,10 @@ AccountModel.prototype.parseXLSX = function (binary) {
 
 AccountModel.prototype.addAccount    = function (accountObject) {
         return new Promise((resolve, reject) => {
+                if (!accountObject.store) {
+                        reject("store property is mandatory!");
+                }
+                accountObject.store = ObjectId(accountObject.store);
                 let account = new AccountsCollection(accountObject);
                 account.count = 1;
                 account.save((err, onSave) => {
