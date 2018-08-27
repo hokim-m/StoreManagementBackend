@@ -13,7 +13,8 @@ let AccountSchema = new Schema({
         oemNumber: String,
         createdTimestamp: Number,
         timestamp: Number,
-        model: String
+        model: String,
+        store: Schema.Types.ObjectId,
 
 }, {
         versionKey: false
