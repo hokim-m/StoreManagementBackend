@@ -89,15 +89,28 @@ router.post('/add', function (req, res) {
  */
 router.post('/login', function (req, res) {
         const login = req.body.login;
-        const hash = req.body.hash;
-        UsersCollection.find({login, hash}, function (err, result) {
+        const hash  = req.body.hash;
+        UsersCollection.aggregate([{$match: {login, hash}}, {
+                $project: {
+                        _id: 1,
+                        login: 1,
+                        name: 1,
+                        group: 1,
+                        store: 1
+                }
+        }], function (err, result) {
                 if (!err) {
                         let found = result.length > 0;
-                        Response.setData(res, found);
+                        if (found) {
+                                Response.setData(res, result[0]);
+                        } else {
+                                Response.setData(res, false);
+                        }
+
                 } else {
                         Response.ErrorWithCodeAndMessage(res, -1, err);
                 }
-        })
+        });
 });
 /**
  * @api {post} /users/edit  Edit User
@@ -161,7 +174,7 @@ router.post('/update', function (req, res) {
                 } else {
                         Response.UNHANDLED_ERROR(res);
                 }
-        })
+        });
 
 });
 /**
