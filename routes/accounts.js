@@ -19,9 +19,9 @@ let router = express.Router();
  */
 
 /**
- * @api {get} /goods/balance/:id  Account Balance
+ * @api {get} /goods/balance/:id  Goods Balance
  * @apiName GetBalance
- * @apiGroup Accounts
+ * @apiGroup Goods
  *
  * @apiParam {Number} id Store Unique ID. Use `all` to select all store available
  *
@@ -60,9 +60,9 @@ router.get('/balance/:id', function (req, res) {
              })
 });
 /**
- * @api {post} /goods/add/  Add Account
- * @apiName AddAccount
- * @apiGroup Accounts
+ * @api {post} /goods/add/  Add Good
+ * @apiName AddGood
+ * @apiGroup Goods
 
  * @apiParam {String} name              Title to represent account
  * @apiParam {String} group             Group identifier for account
@@ -99,9 +99,9 @@ router.post('/add', function (req, res) {
         });
 });
 /**
- * @api {post} /goods/update/  Request Update Account
- * @apiName UpdateAccount
- * @apiGroup Accounts
+ * @api {post} /goods/update/  Request Update Good
+ * @apiName UpdateGood
+ * @apiGroup Goods
  *
  * @apiParam {String} accountId         Title to represent account
  * @apiParam {Account} account          Account data to update
@@ -142,9 +142,9 @@ router.post('/update', function (req, res) {
         })
 });
 /**
- * @api {post} /goods/parse-xlsx/  Request Accounts Parse XSLX
- * @apiName AccountsParseXLSX
- * @apiGroup Accounts
+ * @api {post} /goods/parse-xlsx/  Goods Parse XSLX (uploading file)
+ * @apiName GoodsParseXLSX
+ * @apiGroup Goods
  *
  * @apiParam {File} file         File
  * @apiParam {String} name         File name
@@ -204,9 +204,9 @@ router.post('/parse-xlsx', function (req, res) {
         });
 });
 /**
- * @api {post} /goods/sell/:id  Request Sell Account
- * @apiName SellAccount
- * @apiGroup Accounts
+ * @api {post} /goods/sell/:id  Request Sell Goods
+ * @apiName SellGood
+ * @apiGroup Goods
  *
  * @apiParam {String} id         Account ID (ObjectId hex string representation)
  * @apiParam {Object} account   Account data
@@ -247,7 +247,7 @@ router.post('/sell/:id', function (req, res) {
 /**
  * @api {get} /goods/reports/:id/:from/:to  Request Sale Reports
  * @apiName GetSaleReports
- * @apiGroup Accounts
+ * @apiGroup Goods
  *
  * @apiParam {String} id         Store ID (Object ID hex string representation). Can use `all` to search through all store available
  * @apiParam {Number} from       Unix timestamp in milliseconds. Starting time offset to fetch sold account
