@@ -1,25 +1,28 @@
 let express      = require('express');
 let path         = require('path');
 let cookieParser = require('cookie-parser');
-const Response = require('./views/response');
+const Response   = require('./views/response');
+let formidable   = require('express-formidable');
 
-let indexRouter = require('./routes/index');
-let usersRouter = require('./routes/users');
+let indexRouter    = require('./routes/index');
+let usersRouter    = require('./routes/users');
 let accountsRouter = require('./routes/accounts');
-let storeRouter = require('./routes/store');
+let storeRouter    = require('./routes/store');
 let customerRouter = require('./routes/customers');
 
-let app        = express();
+let app    = express();
 const cors = require('cors');
+app.use(formidable());
 app.use(cors({credentials: true, origin: '*'}));
+
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/binary-store-backend').then(data => {
         console.log('connected to mongo db');
 });
 
 // view engine setup
-app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({extended: true, limit: '50mb'}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -31,13 +34,13 @@ app.use('/customers', customerRouter);
 
 
 app.use('/v1/documentation', function (req, res) {
-        let path = require('path');
+        let path    = require('path');
         let absPath = path.join(__dirname, './apidocs/index.html');
         res.sendFile(absPath);
 });
 app.use('/v1/', function (req, res) {
         let pathName = req.path;
-        let absPath = path.join(__dirname, './apidocs/' + pathName);
+        let absPath  = path.join(__dirname, './apidocs/' + pathName);
 
         res.sendFile(absPath);
 });
@@ -48,6 +51,7 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
+        console.log(err);
         Response.ErrorWithCodeAndMessage(res, -1, err.message);
 });
 

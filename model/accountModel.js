@@ -6,23 +6,27 @@ function AccountModel() {
 
 }
 
-AccountModel.prototype.parseXLSX = function (binary) {
+AccountModel.prototype.parseXLSX = function (binary, store) {
         return new Promise((resolve, reject) => {
                 let xlsx               = require('xlsx');
-                const workbook         = xlsx.read(binary, {type: 'binary'});
+                const workbook         = xlsx.readFile(binary.path);
                 const first_sheet_name = workbook.SheetNames[0];
                 const worksheet        = workbook.Sheets[first_sheet_name];
                 let promises           = [];
-
-                let current_row = 2;
+                let worksheetValueOrDefault = (primary, secondary)=> {
+                        if (!primary) return secondary;
+                        return primary.v;
+                };
+                let current_row = 6;
                 while (!!worksheet['A' + current_row]) {
                         let account = {};
                         // account.oe     = worksheet['A' + current_row].v;
-                        account.oemNumber   = worksheet['B' + current_row].v;
-                        account.modelName   = worksheet['C' + current_row].v;
-                        account.name        = worksheet['D' + current_row].v;
-                        account.unit        = worksheet['E' + current_row].v;
-                        account.description = worksheet['F' + current_row].v;
+                        account.oemNumber   = worksheetValueOrDefault(worksheet['B' + current_row], "");
+                        account.modelName   = worksheetValueOrDefault(worksheet['C' + current_row], "");
+                        account.name        = worksheetValueOrDefault(worksheet['D' + current_row], "");
+                        account.unit        = worksheetValueOrDefault(worksheet['E' + current_row], "");
+                        account.description = worksheetValueOrDefault(worksheet['F' + current_row], "");
+                        account.store = store;
                         promises.push(this.addAccount(account));
 
                         current_row++;

@@ -183,17 +183,23 @@ router.post('/update', function (req, res) {
  *     }
  */
 router.post('/parse-xlsx', function (req, res) {
-        const file = req.body.file;
-        const fileName = req.body.name;
+        console.log(req.fields); // contains non-file fields
+        console.log(req.files);
+        let filesObject = req.files;
+        let body = req.fields;
+        const file = filesObject.file;
+        const fileName = body.name;
+        const store = body.store;
         if (!file) {
                 return Response.ErrorWithCodeAndMessage(res, -1, "Field file is mandatory");
         }
         if (!fileName) {
                 return Response.ErrorWithCodeAndMessage(res, -1, "Filed name is mandatory!");
         }
-        AccountModel.parseXLSX(file).then(data=> {
+        AccountModel.parseXLSX(file, store).then(data=> {
                 Response.setData(res, data);
         }).catch(err=> {
+                console.log(err);
                 Response.ErrorWithCodeAndMessage(res, -1, err);
         });
 });
@@ -314,5 +320,7 @@ router.get('/reports/:id/:from/:to', function (req, res) {
                 Response.ErrorWithCodeAndMessage(res, -1, err);
         })
 });
+router.get('/reports-xlsx/:id/:from/:to', function (req, res) {
 
+});
 module.exports = router;
