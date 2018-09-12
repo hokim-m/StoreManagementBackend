@@ -1,18 +1,22 @@
-let express      = require('express');
-let path         = require('path');
-let cookieParser = require('cookie-parser');
-const Response   = require('./views/response');
-let formidable   = require('express-formidable');
-
+let express        = require('express');
+let path           = require('path');
+let cookieParser   = require('cookie-parser');
+const Response     = require('./views/response');
+const formData     = require('express-form-data');
 let indexRouter    = require('./routes/index');
 let usersRouter    = require('./routes/users');
 let accountsRouter = require('./routes/accounts');
 let storeRouter    = require('./routes/store');
 let customerRouter = require('./routes/customers');
-
-let app    = express();
-const cors = require('cors');
-app.use(formidable());
+const os           = require('os');
+let app            = express();
+const cors         = require('cors');
+const options      = {
+        uploadDir: os.tmpdir(),
+        autoClean: true
+};
+// parse data with connect-multiparty.
+app.use(formData.parse(options));
 app.use(cors({credentials: true, origin: '*'}));
 
 const mongoose = require('mongoose');

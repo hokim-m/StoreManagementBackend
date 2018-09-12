@@ -184,10 +184,9 @@ router.post('/update', function (req, res) {
  *     }
  */
 router.post('/parse-xlsx', function (req, res) {
-        console.log(req.fields); // contains non-file fields
         console.log(req.files);
         let filesObject = req.files;
-        let body = req.fields;
+        let body = req.body;
         const file = filesObject.file;
         const fileName = body.name;
         const store = body.store;
