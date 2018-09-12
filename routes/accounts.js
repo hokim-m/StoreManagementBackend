@@ -19,7 +19,7 @@ let router = express.Router();
  */
 
 /**
- * @api {get} /accounts/balance/:id  Account Balance
+ * @api {get} /goods/balance/:id  Account Balance
  * @apiName GetBalance
  * @apiGroup Accounts
  *
@@ -60,7 +60,7 @@ router.get('/balance/:id', function (req, res) {
              })
 });
 /**
- * @api {post} /accounts/add/  Add Account
+ * @api {post} /goods/add/  Add Account
  * @apiName AddAccount
  * @apiGroup Accounts
 
@@ -99,7 +99,7 @@ router.post('/add', function (req, res) {
         });
 });
 /**
- * @api {post} /accounts/update/  Request Update Account
+ * @api {post} /goods/update/  Request Update Account
  * @apiName UpdateAccount
  * @apiGroup Accounts
  *
@@ -142,12 +142,13 @@ router.post('/update', function (req, res) {
         })
 });
 /**
- * @api {post} /accounts/parse-xlsx/  Request Accounts Parse XSLX
+ * @api {post} /goods/parse-xlsx/  Request Accounts Parse XSLX
  * @apiName AccountsParseXLSX
  * @apiGroup Accounts
  *
- * @apiParam {String} file         BASE64 encoded file data
+ * @apiParam {File} file         File
  * @apiParam {String} name         File name
+ * @apiParam {String} store Store ID
  *
  * @apiSuccess {Object} data Created account list(?).
  * @apiSuccess {Object} meta Common response message.
@@ -204,7 +205,7 @@ router.post('/parse-xlsx', function (req, res) {
         });
 });
 /**
- * @api {post} /accounts/sell/:id  Request Sell Account
+ * @api {post} /goods/sell/:id  Request Sell Account
  * @apiName SellAccount
  * @apiGroup Accounts
  *
@@ -245,7 +246,7 @@ router.post('/sell/:id', function (req, res) {
         })
 });
 /**
- * @api {get} /accounts/reports/:id/:from/:to  Request Sale Reports
+ * @api {get} /goods/reports/:id/:from/:to  Request Sale Reports
  * @apiName GetSaleReports
  * @apiGroup Accounts
  *
