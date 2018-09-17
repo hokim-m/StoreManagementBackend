@@ -47,7 +47,9 @@ AccountModel.prototype.addAccount    = function (accountObject) {
                 }
                 accountObject.store = ObjectId(accountObject.store);
                 let account         = new AccountsCollection(accountObject);
-                account.count       = 1;
+                if (!account.count) {
+                        account.count = 1;
+                }
                 account.save((err, onSave) => {
                         if (!err) {
                                 resolve(onSave);
