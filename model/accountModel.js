@@ -8,25 +8,25 @@ function AccountModel() {
 
 AccountModel.prototype.parseXLSX = function (binary, store) {
         return new Promise((resolve, reject) => {
-                let xlsx               = require('xlsx');
-                const workbook         = xlsx.readFile(binary.path);
-                const first_sheet_name = workbook.SheetNames[0];
-                const worksheet        = workbook.Sheets[first_sheet_name];
-                let promises           = [];
-                let worksheetValueOrDefault = (primary, secondary)=> {
+                let xlsx                    = require('xlsx');
+                const workbook              = xlsx.readFile(binary.path);
+                const first_sheet_name      = workbook.SheetNames[0];
+                const worksheet             = workbook.Sheets[first_sheet_name];
+                let promises                = [];
+                let worksheetValueOrDefault = (primary, secondary) => {
                         if (!primary) return secondary;
                         return primary.v;
                 };
-                let current_row = 6;
+                let current_row             = 6;
                 while (!!worksheet['A' + current_row]) {
-                        let account = {};
+                        let account         = {};
                         // account.oe     = worksheet['A' + current_row].v;
-                        account.oemNumber   = worksheetValueOrDefault(worksheet['B' + current_row], "");
-                        account.modelName   = worksheetValueOrDefault(worksheet['C' + current_row], "");
-                        account.name        = worksheetValueOrDefault(worksheet['D' + current_row], "");
-                        account.unit        = worksheetValueOrDefault(worksheet['E' + current_row], "");
-                        account.description = worksheetValueOrDefault(worksheet['F' + current_row], "");
-                        account.store = store;
+                        account.oemNumber   = worksheetValueOrDefault(worksheet['B' + current_row], '');
+                        account.modelName   = worksheetValueOrDefault(worksheet['C' + current_row], '');
+                        account.name        = worksheetValueOrDefault(worksheet['D' + current_row], '');
+                        account.unit        = worksheetValueOrDefault(worksheet['E' + current_row], '');
+                        account.description = worksheetValueOrDefault(worksheet['F' + current_row], '');
+                        account.store       = store;
                         promises.push(this.addAccount(account));
 
                         current_row++;
@@ -43,11 +43,11 @@ AccountModel.prototype.parseXLSX = function (binary, store) {
 AccountModel.prototype.addAccount    = function (accountObject) {
         return new Promise((resolve, reject) => {
                 if (!accountObject.store) {
-                        reject("store property is mandatory!");
+                        reject('store property is mandatory!');
                 }
                 accountObject.store = ObjectId(accountObject.store);
-                let account = new AccountsCollection(accountObject);
-                account.count = 1;
+                let account         = new AccountsCollection(accountObject);
+                account.count       = 1;
                 account.save((err, onSave) => {
                         if (!err) {
                                 resolve(onSave);
@@ -99,7 +99,13 @@ AccountModel.prototype.balance       = function (query = {}) {
         return new Promise((resolve, reject) => {
                 AccountsCollection.find(query, function (err, accounts) {
                         if (!err) {
-                                resolve(accounts);
+                                let existingAccounts = [];
+                                for (let cAccount in accounts) {
+                                        if (cAccount.count > 0) {
+                                                existingAccounts.push(cAccount)
+                                        }
+                                }
+                                resolve(existingAccounts);
                         } else {
                                 reject(err);
                         }
@@ -121,4 +127,29 @@ AccountModel.prototype.soldBalance = function (query) {
         });
 };
 
-module.exports = new AccountModel();
+AccountModel.prototype.search = function (search) {
+        return new Promise((resolve, reject) => {
+                AccountsCollection.aggregate([
+                        // Project things as a key/value array, along with the original doc
+                        {
+                                $project: {
+                                        array: {$objectToArray: '$things'},
+                                        doc: '$$ROOT'
+                                }
+                        },
+
+                        // Match the docs with a field value of 'red'
+                        {$match: {'array.v': /.*son.*/i}},
+
+                        // Re-project the original doc
+                        {$replaceRoot: {newRoot: '$doc'}}
+                ], function (err, result) {
+                        if (!err) {
+                                resolve(result);
+                        } else {
+                                reject(err);
+                        }
+                });
+        });
+};
+module.exports                = new AccountModel();

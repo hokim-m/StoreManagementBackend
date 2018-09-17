@@ -1,8 +1,8 @@
-const express = require('express');
+const express      = require('express');
 const AccountModel = require('../model/accountModel');
-const Response = require('../views/response');
-let ObjectId = require('mongoose').Types.ObjectId;
-let router = express.Router();
+const Response     = require('../views/response');
+let ObjectId       = require('mongoose').Types.ObjectId;
+let router         = express.Router();
 /**
  * @apiDefine UNHANDLED_ERROR
  *
@@ -50,14 +50,14 @@ let router = express.Router();
  *     }
  */
 router.get('/balance/:id', function (req, res) {
-             let id = req.params.id;
-             let query = id === "all" ? {} : {store: ObjectId(id)};
+        let id    = req.params.id;
+        let query = id === 'all' ? {} : {store: ObjectId(id)};
 
-             AccountModel.balance(query).then(data=> {
-                     Response.setData(res, data);
-             }).catch(err=> {
-                     Response.ErrorWithCodeAndMessage(res, -1, err);
-             })
+        AccountModel.balance(query).then(data => {
+                Response.setData(res, data);
+        }).catch(err => {
+                Response.ErrorWithCodeAndMessage(res, -1, err);
+        });
 });
 /**
  * @api {post} /goods/add/  Add Good
@@ -92,9 +92,9 @@ router.get('/balance/:id', function (req, res) {
  */
 router.post('/add', function (req, res) {
         let body = req.body;
-        AccountModel.addAccount(body).then(data=> {
+        AccountModel.addAccount(body).then(data => {
                 Response.setData(res, data);
-        }).catch(err=> {
+        }).catch(err => {
                 Response.ErrorWithCodeAndMessage(res, -1, err);
         });
 });
@@ -133,13 +133,13 @@ router.post('/add', function (req, res) {
 router.post('/update', function (req, res) {
         let body = req.body;
         if (!body.accountId) {
-                return Response.ErrorWithCodeAndMessage(res, -1, "Account ID is mandatory");
+                return Response.ErrorWithCodeAndMessage(res, -1, 'Account ID is mandatory');
         }
-        AccountModel.updateAccount(body.accountId, body.account).then(data=> {
+        AccountModel.updateAccount(body.accountId, body.account).then(data => {
                 Response.setData(res, data);
-        }).catch(err=> {
+        }).catch(err => {
                 Response.UNHANDLED_ERROR(res);
-        })
+        });
 });
 /**
  * @api {post} /goods/parse-xlsx/  Goods Parse XSLX (uploading file)
@@ -186,19 +186,19 @@ router.post('/update', function (req, res) {
 router.post('/parse-xlsx', function (req, res) {
         console.log(req.files);
         let filesObject = req.files;
-        let body = req.body;
-        const file = filesObject.file;
-        const fileName = body.name;
-        const store = body.store;
+        let body        = req.body;
+        const file      = filesObject.file;
+        const fileName  = body.name;
+        const store     = body.store;
         if (!file) {
-                return Response.ErrorWithCodeAndMessage(res, -1, "Field file is mandatory");
+                return Response.ErrorWithCodeAndMessage(res, -1, 'Field file is mandatory');
         }
         if (!fileName) {
-                return Response.ErrorWithCodeAndMessage(res, -1, "Filed name is mandatory!");
+                return Response.ErrorWithCodeAndMessage(res, -1, 'Filed name is mandatory!');
         }
-        AccountModel.parseXLSX(file, store).then(data=> {
+        AccountModel.parseXLSX(file, store).then(data => {
                 Response.setData(res, data);
-        }).catch(err=> {
+        }).catch(err => {
                 console.log(err);
                 Response.ErrorWithCodeAndMessage(res, -1, err);
         });
@@ -237,12 +237,12 @@ router.post('/parse-xlsx', function (req, res) {
  */
 router.post('/sell/:id', function (req, res) {
         let accountId = req.params.id;
-        let account = req.body;
-        AccountModel.sellAccount(accountId, account).then(data=> {
+        let account   = req.body;
+        AccountModel.sellAccount(accountId, account).then(data => {
                 Response.setData(res, data);
-        }).catch(err=> {
+        }).catch(err => {
                 Response.ErrorWithCodeAndMessage(res, -1, err);
-        })
+        });
 });
 /**
  * @api {get} /goods/reports/:id/:from/:to  Request Sale Reports
@@ -297,16 +297,16 @@ router.post('/sell/:id', function (req, res) {
  */
 router.get('/reports/:id/:from/:to', function (req, res) {
         let from = req.params.from;
-        let to = req.params.to;
-        let id = req.params.id;
+        let to   = req.params.to;
+        let id   = req.params.id;
         if (!id) {
-                return Response.ErrorWithCodeAndMessage(res, -1, "Request param `id` is mandatory");
+                return Response.ErrorWithCodeAndMessage(res, -1, 'Request param `id` is mandatory');
         }
         if (!from) {
-                return Response.ErrorWithCodeAndMessage(res, -1, "Request param `from` is mandatory");
+                return Response.ErrorWithCodeAndMessage(res, -1, 'Request param `from` is mandatory');
         }
         if (!to) {
-                return Response.ErrorWithCodeAndMessage(res, -1, "Request param `to` is mandatory");
+                return Response.ErrorWithCodeAndMessage(res, -1, 'Request param `to` is mandatory');
         }
         let query = {
                 timestamp: {$gte: Number(from), $lte: Number(to)}
@@ -314,13 +314,22 @@ router.get('/reports/:id/:from/:to', function (req, res) {
         if (id !== 'all') {
                 query['store'] = ObjectId(id);
         }
-        AccountModel.soldBalance(query).then(data=> {
+        AccountModel.soldBalance(query).then(data => {
                 Response.setData(res, data);
-        }).catch(err=> {
+        }).catch(err => {
                 Response.ErrorWithCodeAndMessage(res, -1, err);
-        })
+        });
 });
 router.get('/reports-xlsx/:id/:from/:to', function (req, res) {
 
+});
+
+router.post('/search', function (req, res) {
+        const query = req.body.search;
+        AccountModel.search(query).then(data => {
+                Response.setData(res, data);
+        }).catch(err => {
+                Response.setData(res, err);
+        });
 });
 module.exports = router;
