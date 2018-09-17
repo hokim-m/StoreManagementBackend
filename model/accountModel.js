@@ -100,7 +100,8 @@ AccountModel.prototype.balance       = function (query = {}) {
                 AccountsCollection.find(query, function (err, accounts) {
                         if (!err) {
                                 let existingAccounts = [];
-                                for (let cAccount in accounts) {
+                                for (let i=0; i < accounts.length; i++) {
+                                        let cAccount = accounts[i];
                                         if (cAccount.count > 0) {
                                                 existingAccounts.push(cAccount)
                                         }
