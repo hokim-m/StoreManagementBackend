@@ -323,8 +323,42 @@ router.get('/reports/:store_id/:client_id/:from/:to', function (req, res) {
                 Response.ErrorWithCodeAndMessage(res, -1, err);
         });
 });
-router.get('/reports-xlsx/:id/:from/:to', function (req, res) {
+router.get('/reports-xlsx/:store_id/:client_id/:from/:to', function (req, res) {
+        let from      = Number(req.params.from);
+        let to        = Number(req.params.to);
+        let id        = req.params.store_id;
+        let client_id = req.params.client_id;
 
+        if (!id) {
+                return Response.ErrorWithCodeAndMessage(res, -1, 'Request param `id` is mandatory');
+        }
+        if (isNaN(from)) {
+                return Response.ErrorWithCodeAndMessage(res, -1, 'Request param `from` is mandatory');
+        }
+        if (isNaN(to)) {
+                return Response.ErrorWithCodeAndMessage(res, -1, 'Request param `to` is mandatory');
+        }
+        let query = {
+                timestamp: {$gte: Number(from), $lte: Number(to)}
+        };
+        if (id !== 'all') {
+                query['store'] = ObjectId(id);
+        }
+        AccountModel.reportsXLSX(id, from, to, client_id).then(data => {
+                let currentDate = new Date();
+                let year        = currentDate.getFullYear();
+                let month       = (currentDate.getMonth() < 10) ? '0' + (currentDate.getMonth() + 1) : currentDate.getMonth() + 1;
+                let date        = (currentDate.getDate() < 10) ? '0' + currentDate.getDate() : currentDate.getDate();
+                const fileName  = 'reports' + date + '-' + month + '-' + year + '.xlsx"';
+
+                res.header('Content-Type', 'application/octet-stream');
+                res.header('Content-Disposition', 'attachment; filename="' + fileName);
+
+
+                res.send(data);
+        }).catch(err => {
+                Response.ErrorWithCodeAndMessage(res, -1, err);
+        });
 });
 
 router.post('/search', function (req, res) {

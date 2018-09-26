@@ -64,9 +64,10 @@ AccountModel.prototype.addAccount    = function (accountObject) {
 };
 AccountModel.prototype.sellAccount   = function (accountId, accountObject) {
         return new Promise((resolve, reject) => {
-                let count  = accountObject.count;
-                let client = accountObject.clientId;
-                let user   = accountObject.userId;
+                let count            = accountObject.count;
+                let accountCountSell = Number(accountObject.count);
+                let client           = accountObject.clientId;
+                let user             = accountObject.userId;
                 AccountsCollection.findOne({_id: ObjectId(accountId)}, function (err, account) {
                         if (!err) {
                                 let nAccount   = Object.assign({}, account);
@@ -81,7 +82,7 @@ AccountModel.prototype.sellAccount   = function (accountId, accountObject) {
                                 sale.account    = account._id;
                                 sale.clientId   = ObjectId(client);
                                 sale.user       = ObjectId(user);
-                                sale.count      = count;
+                                sale.count      = Number(accountCountSell);
                                 sale.store      = nAccount.store;
                                 sale.timestamp  = new Date().getTime();
                                 sale.overallSum = isNaN(overalSum) ? 0 : Number(overalSum);
@@ -197,10 +198,8 @@ AccountModel.prototype.reports     = function (store = 'all', from, to, client =
                 };
                 let accountMerge  = {$unwind: '$account'};
                 let clientMerge   = {$unwind: '$customer'};
-                
+
                 SalesCollection.aggregate([matchingObject, clientLookUp, clientMerge, accountLookUp, accountMerge], function (err, result) {
-                        console.log(err);
-                        console.log(result);
                         if (!err) {
                                 resolve(result);
                         } else {
@@ -209,19 +208,107 @@ AccountModel.prototype.reports     = function (store = 'all', from, to, client =
                 });
         });
 };
-AccountModel.prototype.reportsXLSX = function (store = 'all', from, to) {
+AccountModel.prototype.reportsXLSX = function (store = 'all', from, to, client = 'all') {
         return new Promise((resolve, reject) => {
-                let matchinObject = {$match: {timestamp: {$gte: from, $lte: to}}};
-                if (store !== 'all') {
-                        matchinObject['$match'].store = ObjectId(store);
-                }
-                AccountsCollection.aggregate([matchinObject], function (err, result) {
-                        if (!err) {
-                                resolve(result);
-                        } else {
-                                reject(err);
+                this.reports(store, Number(from), Number(to), client).then(data => {
+                        console.log(data.length);
+                        let xlsxData = [];
+                        let title    = [
+                                'Name', 'OEM Number', 'Count', 'Unit', 'Price per Unit', 'Overall Sum', 'Customer', 'Time'
+                        ];
+
+                        const fileName = 'base';
+                        xlsxData.push(title);
+
+                        for (let i = 0; i < data.length; i++) {
+                                let sale       = data[i];
+                                let name       = sale.account.name;
+                                let oemNumber  = sale.account.oemNumber;
+                                let count      = sale.count;
+                                let unit       = sale.account.unit;
+                                let priceUnit  = sale.account.price;
+                                let overallSum = sale.overallSum;
+                                let customer   = sale.customer.name;
+                                let date       = new Date(sale.timestamp).toLocaleString('ru');
+
+                                let rowdata = [name, oemNumber, count, unit, priceUnit, overallSum, customer, date];
+                                xlsxData.push(rowdata);
                         }
+                        console.log(xlsxData.length);
+
+                        this.createExcelFile(xlsxData, fileName, true).then(data => {
+                                resolve(data);
+                        });
                 });
         });
 };
-module.exports                     = new AccountModel();
+
+AccountModel.prototype.createExcelFile = function (data, apendName, createFile = true) {
+        return new Promise((resolve, reject) => {
+                let XLSX              = require('xlsx');
+                let leftProductsSheet = 'ЛИСТ 1';
+
+
+                let workbook        = {};
+                workbook.Sheets     = {};
+                workbook.Props      = {};
+                workbook.SSF        = {};
+                workbook.SheetNames = [];
+
+
+                let worksheetLeft = {};
+                let worksheetSold = {};
+                let range         = {s: {c: 0, r: 0}, e: {c: 0, r: 0}};
+                for (let R = 0; R != data.length; ++R) {
+                        if (range.e.r < R) range.e.r = R;
+                        for (let C = 0; C != data[R].length; ++C) {
+                                if (range.e.c < C) range.e.c = C;
+
+                                /* create cell object: .v is the actual data */
+                                let cell = {v: data[R][C]};
+                                if (cell.v == null) continue;
+
+                                /* create the correct cell reference */
+                                let cell_ref = XLSX.utils.encode_cell({c: C, r: R});
+
+                                /* determine the cell type */
+                                if (typeof cell.v === 'number') {
+                                        cell.t = 'n';
+                                } else {
+                                        cell.t = 's';
+                                }
+                                /* add to structure */
+                                worksheetLeft[cell_ref] = cell;
+                        }
+                }
+
+                worksheetLeft['!ref']        = XLSX.utils.encode_range(range);
+                worksheetLeft['formatCells'] = true;
+                workbook.SheetNames.push(leftProductsSheet);
+                workbook.Sheets[leftProductsSheet] = worksheetLeft;
+
+                let wopts = {
+                        bookType: 'xlsx',
+                        type: 'buffer'
+                };
+
+                let wbout = XLSX.write(workbook, wopts);
+
+                function s2ab(s) {
+                        let buf  = new ArrayBuffer(s.length);
+                        let view = new Uint8Array(buf);
+                        for (let i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+                        return buf;
+                }
+
+                let currentDate = new Date();
+                let year        = currentDate.getFullYear();
+                let month       = (currentDate.getMonth() < 10) ? '0' + (currentDate.getMonth() + 1) : currentDate.getMonth() + 1;
+                let date        = (currentDate.getDate() < 10) ? '0' + currentDate.getDate() : currentDate.getDate();
+                const fileName  = apendName + date + '-' + month + '-' + year + '.xlsx';
+
+                resolve(wbout)
+
+        });
+};
+module.exports                         = new AccountModel();
