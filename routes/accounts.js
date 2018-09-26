@@ -209,8 +209,9 @@ router.post('/parse-xlsx', function (req, res) {
  * @apiGroup Goods
  *
  * @apiParam {String} id         Account ID (ObjectId hex string representation)
- * @apiParam {Object} account   Account data
- *
+ * @apiParam {String} clientId   Client ID (ObjectId hex string representation)
+ * @apiParam {Number} count     Number of products to sell
+ * @apiParam {String} userId    User ID (ObjectId hex string representation)
  * @apiSuccess {Object} data Stored account data in DB.
  * @apiSuccess {Object} meta Common response message.
  *
@@ -237,8 +238,8 @@ router.post('/parse-xlsx', function (req, res) {
  */
 router.post('/sell/:id', function (req, res) {
         let accountId = req.params.id;
-        let account   = req.body;
-        AccountModel.sellAccount(accountId, account).then(data => {
+        let body   = req.body;
+        AccountModel.sellAccount(accountId, body).then(data => {
                 Response.setData(res, data);
         }).catch(err => {
                 Response.ErrorWithCodeAndMessage(res, -1, err);

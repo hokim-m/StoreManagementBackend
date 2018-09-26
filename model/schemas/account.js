@@ -9,7 +9,7 @@ let AccountSchema = new Schema({
         imageLink: String,
         unit: String,
         source: String,
-        price: String,
+        price: Number,
         oemNumber: String,
         createdTimestamp: Number,
         timestamp: Number,

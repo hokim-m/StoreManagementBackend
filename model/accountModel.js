@@ -1,6 +1,8 @@
 const Promise            = require('bluebird');
 const AccountsCollection = require('./schemas/account');
-const ObjectId           = require('mongoose').Types.ObjectId;
+const SalesCollection    = require('./schemas/sale');
+
+const ObjectId = require('mongoose').Types.ObjectId;
 
 function AccountModel() {
 
@@ -62,22 +64,37 @@ AccountModel.prototype.addAccount    = function (accountObject) {
 };
 AccountModel.prototype.sellAccount   = function (accountId, accountObject) {
         return new Promise((resolve, reject) => {
-                AccountsCollection.update({
-                        _id: ObjectId(accountId)
-                }, {
-                        $set: {
-                                count: 0,
-                                timestamp: (new Date()).getTime()
-                        }
-                }, function (err, result) {
+                let count  = accountObject.count;
+                let client = accountObject.clientId;
+                let user   = accountObject.userId;
+                AccountsCollection.findOne({_id: ObjectId(accountId)}, function (err, account) {
                         if (!err) {
-                                resolve(result);
+                                let nAccount = Object.assign({}, account);
+                                nAccount.count = count;
+                                account.count -= count;
+                                account.save((err, onSave)=> {
+                                        console.log(err);
+                                        console.log(onSave);
+                                });
+                                let sale = new SalesCollection();
+                                let overalSum = Number(account.price) * Number(count);
+                                sale.account = account._id;
+                                sale.clientId = ObjectId(client);
+                                sale.user = ObjectId(user);
+                                sale.count = count;
+                                sale.store = nAccount.store;
+                                sale.timestamp = new Date().getTime();
+                                sale.overallSum = isNaN(overalSum) ? 0 : Number(overalSum);
+                                sale.save((err, onSave)=> {
+                                        console.log(err);
+                                        console.log(onSave);
+                                        resolve(onSave);
+                                })
                         } else {
                                 reject(err);
                         }
                 });
         });
-
 };
 AccountModel.prototype.updateAccount = function (accountId, accountObject) {
         return new Promise((resolve, reject) => {
@@ -102,10 +119,10 @@ AccountModel.prototype.balance       = function (query = {}) {
                 AccountsCollection.find(query, function (err, accounts) {
                         if (!err) {
                                 let existingAccounts = [];
-                                for (let i=0; i < accounts.length; i++) {
+                                for (let i = 0; i < accounts.length; i++) {
                                         let cAccount = accounts[i];
                                         if (cAccount.count > 0) {
-                                                existingAccounts.push(cAccount)
+                                                existingAccounts.push(cAccount);
                                         }
                                 }
                                 resolve(existingAccounts);
@@ -129,8 +146,7 @@ AccountModel.prototype.soldBalance = function (query) {
                 });
         });
 };
-
-AccountModel.prototype.search = function (search) {
+AccountModel.prototype.search      = function (search) {
         return new Promise((resolve, reject) => {
                 AccountsCollection.aggregate([
                         // Project things as a key/value array, along with the original doc
@@ -155,4 +171,19 @@ AccountModel.prototype.search = function (search) {
                 });
         });
 };
-module.exports                = new AccountModel();
+AccountModel.prototype.reportsXLSX = function (store = 'all', from, to) {
+        return new Promise((resolve, reject) => {
+                let matchinObject = {$match: {timestamp: {$gte: from, $lte: to}}};
+                if (store !== 'all') {
+                        matchinObject['$match'].store = ObjectId(store);
+                }
+                AccountsCollection.aggregate([matchinObject], function (err, result) {
+                        if (!err) {
+                                resolve(result);
+                        } else {
+                                reject(err);
+                        }
+                });
+        });
+};
+module.exports                     = new AccountModel();
