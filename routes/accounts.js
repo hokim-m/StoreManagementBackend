@@ -363,6 +363,8 @@ router.get('/reports-xlsx/:store_id/:client_id/:from/:to', function (req, res) {
 
 router.post('/search', function (req, res) {
         const query = req.body.search;
+        let store = req.body.store;
+
         AccountModel.search(query).then(data => {
                 Response.setData(res, data);
         }).catch(err => {

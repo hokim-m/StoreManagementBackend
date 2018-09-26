@@ -145,25 +145,47 @@ AccountModel.prototype.soldBalance = function (query) {
                 });
         });
 };
-AccountModel.prototype.search      = function (search) {
+AccountModel.prototype.search      = function (search = '', store = 'all') {
         return new Promise((resolve, reject) => {
-                AccountsCollection.aggregate([
-                        // Project things as a key/value array, along with the original doc
-                        {
-                                $project: {
-                                        array: {$objectToArray: '$things'},
-                                        doc: '$$ROOT'
-                                }
-                        },
-
-                        // Match the docs with a field value of 'red'
-                        {$match: {'array.v': /.*son.*/i}},
-
-                        // Re-project the original doc
-                        {$replaceRoot: {newRoot: '$doc'}}
-                ], function (err, result) {
+                let matchinObject = {count: {$gt: 0}};
+                if (store !== 'all') {
+                        matchinObject['store'] = ObjectId(store);
+                }
+                AccountsCollection.find(matchinObject, function (err, result) {
                         if (!err) {
-                                resolve(result);
+                                let accounts = result.slice();
+                                let filtered = [];
+                                console.log(accounts.length);
+                                for (let i=0; i < accounts.length; i++) {
+                                        let found = false;
+                                        let mAccount = accounts[i];
+                                        let account = {
+                                                _id: mAccount._id.toString(),
+                                                name: mAccount,
+                                                count: mAccount.count,
+                                                group: mAccount.group,
+                                                description: mAccount.description,
+                                                unit: mAccount.unit,
+                                                price: mAccount.price,
+                                                oemNumber: mAccount.oemNumber,
+                                                timestamp: mAccount.timestamp,
+                                                model: mAccount.timestamp,
+                                                store: mAccount.store.toString(),
+                                        };
+                                        let keys = Object.keys(account);
+                                        for (let j=0; j < keys.length; j++) {
+                                                let value = account[keys[j]];
+                                                if (String(value).indexOf(search) !== -1) {
+                                                        found = true;
+                                                        break;
+                                                }
+                                        }
+                                        if (found) {
+                                                filtered.push(account);
+                                        }
+
+                                }
+                                resolve(filtered);
                         } else {
                                 reject(err);
                         }
@@ -307,7 +329,7 @@ AccountModel.prototype.createExcelFile = function (data, apendName, createFile =
                 let date        = (currentDate.getDate() < 10) ? '0' + currentDate.getDate() : currentDate.getDate();
                 const fileName  = apendName + date + '-' + month + '-' + year + '.xlsx';
 
-                resolve(wbout)
+                resolve(wbout);
 
         });
 };
