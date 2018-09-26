@@ -238,7 +238,7 @@ router.post('/parse-xlsx', function (req, res) {
  */
 router.post('/sell/:id', function (req, res) {
         let accountId = req.params.id;
-        let body   = req.body;
+        let body      = req.body;
         AccountModel.sellAccount(accountId, body).then(data => {
                 Response.setData(res, data);
         }).catch(err => {
@@ -296,17 +296,19 @@ router.post('/sell/:id', function (req, res) {
  *       }
  *     }
  */
-router.get('/reports/:id/:from/:to', function (req, res) {
-        let from = req.params.from;
-        let to   = req.params.to;
-        let id   = req.params.id;
+router.get('/reports/:store_id/:client_id/:from/:to', function (req, res) {
+        let from      = Number(req.params.from);
+        let to        = Number(req.params.to);
+        let id        = req.params.store_id;
+        let client_id = req.params.client_id;
+
         if (!id) {
                 return Response.ErrorWithCodeAndMessage(res, -1, 'Request param `id` is mandatory');
         }
-        if (!from) {
+        if (isNaN(from)) {
                 return Response.ErrorWithCodeAndMessage(res, -1, 'Request param `from` is mandatory');
         }
-        if (!to) {
+        if (isNaN(to)) {
                 return Response.ErrorWithCodeAndMessage(res, -1, 'Request param `to` is mandatory');
         }
         let query = {
@@ -315,7 +317,7 @@ router.get('/reports/:id/:from/:to', function (req, res) {
         if (id !== 'all') {
                 query['store'] = ObjectId(id);
         }
-        AccountModel.soldBalance(query).then(data => {
+        AccountModel.reports(id, from, to, client_id).then(data => {
                 Response.setData(res, data);
         }).catch(err => {
                 Response.ErrorWithCodeAndMessage(res, -1, err);

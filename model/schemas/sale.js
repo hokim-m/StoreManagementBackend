@@ -4,7 +4,7 @@ const ObjectId = Schema.Types.ObjectId;
 let SaleSchema = new Schema({
         account: {type: ObjectId, ref: 'accounts'},
         count: Number,
-        clientId: ObjectId,
+        clientId: {type: ObjectId, ref: 'customers'},
         overallSum: Number,
         storeId: ObjectId,
         timestamp: Number,

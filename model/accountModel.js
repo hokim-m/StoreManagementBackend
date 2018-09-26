@@ -69,27 +69,25 @@ AccountModel.prototype.sellAccount   = function (accountId, accountObject) {
                 let user   = accountObject.userId;
                 AccountsCollection.findOne({_id: ObjectId(accountId)}, function (err, account) {
                         if (!err) {
-                                let nAccount = Object.assign({}, account);
+                                let nAccount   = Object.assign({}, account);
                                 nAccount.count = count;
                                 account.count -= count;
-                                account.save((err, onSave)=> {
+                                account.save((err, onSave) => {
                                         console.log(err);
                                         console.log(onSave);
                                 });
-                                let sale = new SalesCollection();
-                                let overalSum = Number(account.price) * Number(count);
-                                sale.account = account._id;
-                                sale.clientId = ObjectId(client);
-                                sale.user = ObjectId(user);
-                                sale.count = count;
-                                sale.store = nAccount.store;
-                                sale.timestamp = new Date().getTime();
+                                let sale        = new SalesCollection();
+                                let overalSum   = Number(account.price) * Number(count);
+                                sale.account    = account._id;
+                                sale.clientId   = ObjectId(client);
+                                sale.user       = ObjectId(user);
+                                sale.count      = count;
+                                sale.store      = nAccount.store;
+                                sale.timestamp  = new Date().getTime();
                                 sale.overallSum = isNaN(overalSum) ? 0 : Number(overalSum);
-                                sale.save((err, onSave)=> {
-                                        console.log(err);
-                                        console.log(onSave);
+                                sale.save((err, onSave) => {
                                         resolve(onSave);
-                                })
+                                });
                         } else {
                                 reject(err);
                         }
@@ -163,6 +161,46 @@ AccountModel.prototype.search      = function (search) {
                         // Re-project the original doc
                         {$replaceRoot: {newRoot: '$doc'}}
                 ], function (err, result) {
+                        if (!err) {
+                                resolve(result);
+                        } else {
+                                reject(err);
+                        }
+                });
+        });
+};
+
+AccountModel.prototype.reports     = function (store = 'all', from, to, client = 'all') {
+        return new Promise((resolve, reject) => {
+                let matchingObject = {$match: {timestamp: {$gte: from, $lte: to}}};
+                if (store !== 'all') {
+                        matchingObject['$match'].store = ObjectId(store);
+                }
+                if (client !== 'all') {
+                        matchingObject['$match'].clientId = ObjectId(client);
+                }
+                let accountLookUp = {
+                        $lookup: {
+                                from: 'accounts',
+                                localField: 'account',
+                                foreignField: '_id',
+                                as: 'account'
+                        }
+                };
+                let clientLookUp  = {
+                        $lookup: {
+                                from: 'customers',
+                                localField: 'clientId',
+                                foreignField: '_id',
+                                as: 'customer'
+                        }
+                };
+                let accountMerge  = {$unwind: '$account'};
+                let clientMerge   = {$unwind: '$customer'};
+                
+                SalesCollection.aggregate([matchingObject, clientLookUp, clientMerge, accountLookUp, accountMerge], function (err, result) {
+                        console.log(err);
+                        console.log(result);
                         if (!err) {
                                 resolve(result);
                         } else {
