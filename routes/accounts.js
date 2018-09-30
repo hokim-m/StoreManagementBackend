@@ -246,11 +246,12 @@ router.post('/sell/:id', function (req, res) {
         });
 });
 /**
- * @api {get} /goods/reports/:id/:from/:to  Request Sale Reports
+ * @api {get} /goods/reports/:store_id/:cliet_id/:from/:to  Request Sale Reports
  * @apiName GetSaleReports
  * @apiGroup Goods
  *
- * @apiParam {String} id         Store ID (Object ID hex string representation). Can use `all` to search through all store available
+ * @apiParam {String} store_id         Store ID (Object ID hex string representation). Can use `all` to search through all store available
+ * @apiParam {String} store_id         Client ID (Object ID hex string representation). Can use `all` to search through all customers available
  * @apiParam {Number} from       Unix timestamp in milliseconds. Starting time offset to fetch sold account
  * @apiParam {Number} to        Unix timestamp in milliseconds. Limiting time offset to fetch sold accounts
  *
@@ -323,6 +324,53 @@ router.get('/reports/:store_id/:client_id/:from/:to', function (req, res) {
                 Response.ErrorWithCodeAndMessage(res, -1, err);
         });
 });
+/**
+ * @api {get} /goods/reports-xlsx/:store_id/:cliet_id/:from/:to  Sale Reports (XLSX)
+ * @apiName GetSaleReportsXLSX
+ * @apiGroup Goods
+ *
+ * @apiParam {String} store_id         Store ID (Object ID hex string representation). Can use `all` to search through all store available
+ * @apiParam {String} store_id         Client ID (Object ID hex string representation). Can use `all` to search through all customers available
+ * @apiParam {Number} from       Unix timestamp in milliseconds. Starting time offset to fetch sold account
+ * @apiParam {Number} to        Unix timestamp in milliseconds. Limiting time offset to fetch sold accounts
+ *
+ * @apiSuccess {Object} data Created account list(?).
+ * @apiSuccess {Object} meta Common response message.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *
+ *     XLSX file binary data.
+ *
+ * @apiUse UNHANDLED_ERROR
+ * @apiError GetSaleReportsStoreID Request param <code>:id</code> is mandatory
+ * @apiErrorExample GetSaleReportsStoreID:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Request param `id`  is mandatory."
+ *       }
+ *     }
+ * @apiError GetSaleReportsFromTimestamp Request param <code>:from</code> is mandatory
+ * @apiErrorExample GetSaleReportsFromTimestamp:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Request param `from`  is mandatory."
+ *       }
+ *     }
+ * @apiError GetSaleReportsToTimestamp Request param <code>:to</code> is mandatory
+ * @apiErrorExample GetSaleReportsToTimestamp:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Request param `to`  is mandatory."
+ *       }
+ *     }
+ */
 router.get('/reports-xlsx/:store_id/:client_id/:from/:to', function (req, res) {
         let from      = Number(req.params.from);
         let to        = Number(req.params.to);
@@ -360,11 +408,44 @@ router.get('/reports-xlsx/:store_id/:client_id/:from/:to', function (req, res) {
                 Response.ErrorWithCodeAndMessage(res, -1, err);
         });
 });
-
+/**
+ * @api {post} /goods/search/  Search Goods
+ * @apiName SearchGoodsQuery
+ * @apiGroup Goods
+ *
+ * @apiParam {String} search         Search value. Searching through all available properties
+ * @apiParam {String} store         Store ID. Can specify which store to search
+ *
+ * @apiSuccess {Object} data Created account list(?).
+ * @apiSuccess {Object} meta Common response message.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "data": [{Account}],
+ *       "meta": {
+ *              "code": 0,
+ *              "message": "OK"
+ *       }
+ *     }
+ *
+ * @apiUse UNHANDLED_ERROR
+ * @apiError SearchGoodsQuerySearch Request param <code>:search</code> is mandatory
+ * @apiErrorExample GetSaleReportsStoreID:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Request param `search`  is mandatory."
+ *       }
+ *     }
+ */
 router.post('/search', function (req, res) {
         const query = req.body.search;
         let store = req.body.store;
-
+        if (!query) {
+                return Response.ErrorWithCodeAndMessage(res, -1, "Request param `search`  is mandatory");
+        }
         AccountModel.search(query).then(data => {
                 Response.setData(res, data);
         }).catch(err => {
