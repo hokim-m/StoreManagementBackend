@@ -84,7 +84,9 @@ AccountModel.prototype.sellAccount   = function (accountId, accountObject) {
                                 let sale        = new SalesCollection();
                                 let overalSum   = Number(account.price) * Number(count);
                                 sale.account    = account._id;
-                                sale.clientId   = ObjectId(client);
+                                if (client) {
+                                        sale.clientId   = ObjectId(client);
+                                }
                                 sale.user       = ObjectId(user);
                                 sale.storeId    = account.store;
                                 sale.count      = Number(accountCountSell);
