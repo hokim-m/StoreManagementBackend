@@ -88,7 +88,6 @@ AccountModel.prototype.sellAccount   = function (accountId, accountObject) {
                                 sale.user       = ObjectId(user);
                                 sale.storeId    = account.store;
                                 sale.count      = Number(accountCountSell);
-                                sale.store      = nAccount.store;
                                 sale.timestamp  = new Date().getTime();
                                 sale.overallSum = isNaN(overalSum) ? 0 : Number(overalSum);
                                 sale.save((err, onSave) => {
