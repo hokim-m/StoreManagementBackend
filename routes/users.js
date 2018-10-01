@@ -113,7 +113,7 @@ router.post('/login', function (req, res) {
         });
 });
 /**
- * @api {post} /users/update  Edit User
+ * @api {post} /users/edit  Edit User
  * @apiName EditUser
  * @apiGroup Users
 
@@ -153,7 +153,7 @@ router.post('/login', function (req, res) {
  *       }
  *     }
  */
-router.post('/update', function (req, res) {
+router.post('/edit', function (req, res) {
         const userId       = req.body.userId;
         const user         = req.body.user;
         let updatingParams = {$set: {}};
