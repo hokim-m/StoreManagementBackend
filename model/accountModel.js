@@ -8,6 +8,12 @@ function AccountModel() {
 
 }
 
+AccountModel.prototype.addImage = function () {
+        return new Promise((resolve, reject) => {
+
+        });
+};
+
 AccountModel.prototype.parseXLSX = function (binary, store) {
         return new Promise((resolve, reject) => {
                 let xlsx                    = require('xlsx');
@@ -81,11 +87,11 @@ AccountModel.prototype.sellAccount   = function (accountId, accountObject) {
 
                                         console.log(onSave);
                                 });
-                                let sale        = new SalesCollection();
-                                let overalSum   = Number(account.price) * Number(count);
-                                sale.account    = account._id;
+                                let sale      = new SalesCollection();
+                                let overalSum = Number(account.price) * Number(count);
+                                sale.account  = account._id;
                                 if (client) {
-                                        sale.clientId   = ObjectId(client);
+                                        sale.clientId = ObjectId(client);
                                 }
                                 sale.user       = ObjectId(user);
                                 sale.storeId    = account.store;
@@ -122,7 +128,7 @@ AccountModel.prototype.updateAccount = function (accountId, accountObject) {
                                         } else {
                                                 reject(err);
                                         }
-                                })
+                                });
 
                         } else {
                                 reject(err);
@@ -259,7 +265,11 @@ AccountModel.prototype.reportsXLSX = function (store = 'all', from, to, client =
                                 let unit       = sale.account.unit;
                                 let priceUnit  = sale.account.price;
                                 let overallSum = sale.overallSum;
-                                let customer   = sale.customer.name;
+                                let customer = "";
+                                if (sale.customer) {
+                                          customer = sale.customer.name;
+                                }
+
                                 let date       = new Date(sale.timestamp).toLocaleString('ru');
 
                                 let rowdata = [name, oemNumber, count, unit, priceUnit, overallSum, customer, date];
