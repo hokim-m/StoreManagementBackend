@@ -116,7 +116,14 @@ AccountModel.prototype.updateAccount = function (accountId, accountObject) {
                         _id: ObjectId(accountId)
                 }, updatingObject, function (err, result) {
                         if (!err) {
-                                resolve(result);
+                                AccountsCollection.findOne({_id: ObjectId(accountId)}, function (err, updatedAccount) {
+                                        if (!err) {
+                                                resolve(updatedAccount);
+                                        } else {
+                                                reject(err);
+                                        }
+                                })
+
                         } else {
                                 reject(err);
                         }

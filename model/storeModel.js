@@ -68,9 +68,14 @@ StoreModel.prototype.edit   = function (storeId, storeObject) {
                 StoreCollection.update({
                         _id: ObjectId(storeId)
                 }, updatingKeys, function (err, result) {
-                        console.log(err);
-                        console.log(result);
                         if (!err) {
+                                StoreCollection.findOne({_id: ObjectId(storeId)}, function (err, updatedStore) {
+                                        if (!err) {
+                                                resolve(updatedStore)
+                                        } else {
+                                                reject(err);
+                                        }
+                                });
                                 resolve(result);
                         } else {
                                 reject(err);
