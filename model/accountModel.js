@@ -233,6 +233,8 @@ AccountModel.prototype.reports     = function (store = 'all', from, to, client =
                         if (!err) {
                                 resolve(result);
                         } else {
+                                console.log("error aggreagtion sales data");
+                                console.log(err);
                                 reject(err);
                         }
                 });
