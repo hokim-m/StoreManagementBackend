@@ -218,17 +218,8 @@ AccountModel.prototype.reports     = function (store = 'all', from, to, client =
                                 as: 'account'
                         }
                 };
-                let clientLookUp  = {
-                        $lookup: {
-                                from: 'customers',
-                                localField: 'clientId',
-                                foreignField: '_id',
-                                as: 'customer'
-                        }
-                };
                 let accountMerge  = {$unwind: '$account'};
-                let clientMerge   = {$unwind: '$customer'};
-                SalesCollection.aggregate([matchingObject, clientLookUp, clientMerge, accountLookUp, accountMerge], function (err, result) {
+                SalesCollection.aggregate([matchingObject, accountLookUp, accountMerge], function (err, result) {
                         if (!err) {
                                 resolve(result);
                         } else {
