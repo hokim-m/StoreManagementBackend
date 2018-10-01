@@ -444,7 +444,10 @@ router.post('/search', function (req, res) {
         const query = req.body.search;
         let store = req.body.store;
         if (!query) {
-                return Response.ErrorWithCodeAndMessage(res, -1, "Request param `search`  is mandatory");
+                return Response.setData(res, []);
+        }
+        if (!query.length) {
+                return Response.setData(res, []);
         }
         AccountModel.search(query).then(data => {
                 Response.setData(res, data);
