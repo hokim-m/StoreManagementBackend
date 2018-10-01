@@ -169,7 +169,7 @@ AccountModel.prototype.search      = function (search = '', store = 'all') {
                                         let mAccount = accounts[i];
                                         let account = {
                                                 _id: mAccount._id.toString(),
-                                                name: mAccount,
+                                                name: mAccount.product.name,
                                                 count: mAccount.count,
                                                 group: mAccount.group,
                                                 description: mAccount.description,
