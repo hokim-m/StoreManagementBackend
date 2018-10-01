@@ -113,7 +113,7 @@ router.post('/login', function (req, res) {
         });
 });
 /**
- * @api {post} /users/edit  Edit User
+ * @api {post} /users/update  Edit User
  * @apiName EditUser
  * @apiGroup Users
 
@@ -170,7 +170,9 @@ router.post('/update', function (req, res) {
 
         UsersCollection.update({_id: ObjectId(userId)}, updatingParams, function (err, result) {
                 if (!err) {
-                        Response.setData(res, result);
+                        UsersCollection.findOne({_id: ObjectId(userId)}, function (err, user) {
+                                Response.setData(res, user);
+                        });
                 } else {
                         Response.UNHANDLED_ERROR(res);
                 }
