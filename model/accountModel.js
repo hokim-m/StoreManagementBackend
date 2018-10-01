@@ -75,7 +75,7 @@ AccountModel.prototype.sellAccount   = function (accountId, accountObject) {
                                 account.count -= accountCountSell;
                                 account.save((err, onSave) => {
                                         if (err) {
-                                                console.log("error selling account");
+                                                console.log('error selling account');
                                                 console.log(err);
                                         }
 
@@ -86,13 +86,14 @@ AccountModel.prototype.sellAccount   = function (accountId, accountObject) {
                                 sale.account    = account._id;
                                 sale.clientId   = ObjectId(client);
                                 sale.user       = ObjectId(user);
+                                sale.storeId    = account.store;
                                 sale.count      = Number(accountCountSell);
                                 sale.store      = nAccount.store;
                                 sale.timestamp  = new Date().getTime();
                                 sale.overallSum = isNaN(overalSum) ? 0 : Number(overalSum);
                                 sale.save((err, onSave) => {
                                         if (err) {
-                                                console.log("error saving sale");
+                                                console.log('error saving sale');
                                                 console.log(err);
                                         }
                                         resolve(onSave);
@@ -164,10 +165,10 @@ AccountModel.prototype.search      = function (search = '', store = 'all') {
                                 let accounts = result.slice();
                                 let filtered = [];
                                 console.log(accounts.length);
-                                for (let i=0; i < accounts.length; i++) {
-                                        let found = false;
+                                for (let i = 0; i < accounts.length; i++) {
+                                        let found    = false;
                                         let mAccount = accounts[i];
-                                        let account = {
+                                        let account  = {
                                                 _id: mAccount._id.toString(),
                                                 name: mAccount.name,
                                                 count: mAccount.count,
@@ -178,10 +179,10 @@ AccountModel.prototype.search      = function (search = '', store = 'all') {
                                                 oemNumber: mAccount.oemNumber,
                                                 timestamp: mAccount.timestamp,
                                                 model: mAccount.timestamp,
-                                                store: mAccount.store.toString(),
+                                                store: mAccount.store.toString()
                                         };
-                                        let keys = Object.keys(account);
-                                        for (let j=0; j < keys.length; j++) {
+                                        let keys     = Object.keys(account);
+                                        for (let j = 0; j < keys.length; j++) {
                                                 let value = account[keys[j]];
                                                 if (String(value).indexOf(search) !== -1) {
                                                         found = true;
@@ -205,7 +206,7 @@ AccountModel.prototype.reports     = function (store = 'all', from, to, client =
         return new Promise((resolve, reject) => {
                 let matchingObject = {$match: {timestamp: {$gte: from, $lte: to}}};
                 if (store !== 'all') {
-                        matchingObject['$match'].store = ObjectId(store);
+                        matchingObject['$match'].storeId = ObjectId(store);
                 }
                 if (client !== 'all') {
                         matchingObject['$match'].clientId = ObjectId(client);
@@ -228,12 +229,12 @@ AccountModel.prototype.reports     = function (store = 'all', from, to, client =
                 };
                 let accountMerge  = {$unwind: '$account'};
                 let clientMerge   = {$unwind: '$customer'};
-
+                console.log(matchingObject, clientLookUp, clientMerge, accountLookUp, accountMerge);
                 SalesCollection.aggregate([matchingObject, clientLookUp, clientMerge, accountLookUp, accountMerge], function (err, result) {
                         if (!err) {
                                 resolve(result);
                         } else {
-                                console.log("error aggreagtion sales data");
+                                console.log('error aggreagtion sales data');
                                 console.log(err);
                                 reject(err);
                         }
