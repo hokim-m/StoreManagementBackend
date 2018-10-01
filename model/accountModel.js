@@ -71,10 +71,14 @@ AccountModel.prototype.sellAccount   = function (accountId, accountObject) {
                 AccountsCollection.findOne({_id: ObjectId(accountId)}, function (err, account) {
                         if (!err) {
                                 let nAccount   = Object.assign({}, account);
-                                nAccount.count = count;
-                                account.count -= count;
+                                nAccount.count = accountCountSell;
+                                account.count -= accountCountSell;
                                 account.save((err, onSave) => {
-                                        console.log(err);
+                                        if (err) {
+                                                console.log("error selling account");
+                                                console.log(err);
+                                        }
+
                                         console.log(onSave);
                                 });
                                 let sale        = new SalesCollection();
@@ -87,6 +91,10 @@ AccountModel.prototype.sellAccount   = function (accountId, accountObject) {
                                 sale.timestamp  = new Date().getTime();
                                 sale.overallSum = isNaN(overalSum) ? 0 : Number(overalSum);
                                 sale.save((err, onSave) => {
+                                        if (err) {
+                                                console.log("error saving sale");
+                                                console.log(err);
+                                        }
                                         resolve(onSave);
                                 });
                         } else {
