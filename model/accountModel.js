@@ -229,7 +229,6 @@ AccountModel.prototype.reports     = function (store = 'all', from, to, client =
                 };
                 let accountMerge  = {$unwind: '$account'};
                 let clientMerge   = {$unwind: '$customer'};
-                console.log(matchingObject, clientLookUp, clientMerge, accountLookUp, accountMerge);
                 SalesCollection.aggregate([matchingObject, clientLookUp, clientMerge, accountLookUp, accountMerge], function (err, result) {
                         if (!err) {
                                 resolve(result);
