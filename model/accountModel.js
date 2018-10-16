@@ -251,7 +251,7 @@ AccountModel.prototype.reportsXLSX     = function (store = 'all', from, to, clie
                         console.log(data.length);
                         let xlsxData = [];
                         let title    = [
-                                'Name', 'OEM Number', 'Count', 'Unit', 'Price per Unit', 'Overall Sum', 'Customer', 'Time'
+                                'Наименование', 'OEM Номер', 'Кол-во', 'Единица', 'Цена за единицу', 'Итоговая сумма', 'Клиент', 'Время продажи'
                         ];
 
                         const fileName = 'base';
