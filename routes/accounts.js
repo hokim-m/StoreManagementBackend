@@ -59,6 +59,28 @@ router.get('/balance/:id', function (req, res) {
                 Response.ErrorWithCodeAndMessage(res, -1, err);
         });
 });
+
+router.get('/balance-xlsx/:id', function (req, res) {
+        let id    = req.params.id;
+        let query = id === 'all' ? {} : {store: ObjectId(id)};
+
+        AccountModel.balanceXLSX(query).then(data => {
+                let currentDate = new Date();
+                let year        = currentDate.getFullYear();
+                let month       = (currentDate.getMonth() < 10) ? '0' + (currentDate.getMonth() + 1) : currentDate.getMonth() + 1;
+                let date        = (currentDate.getDate() < 10) ? '0' + currentDate.getDate() : currentDate.getDate();
+                const fileName  = 'balance' + date + '-' + month + '-' + year + '.xlsx"';
+
+                res.header('Content-Type', 'application/octet-stream');
+                res.header('Content-Disposition', 'attachment; filename="' + fileName);
+
+
+                res.send(data);
+        }).catch(err => {
+                Response.ErrorWithCodeAndMessage(res, -1, err);
+        });
+});
+
 /**
  * @api {post} /goods/add/  Add Good
  * @apiName AddGood

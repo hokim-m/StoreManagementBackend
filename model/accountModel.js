@@ -216,7 +216,7 @@ AccountModel.prototype.search      = function (search = '', store = 'all') {
         });
 };
 
-AccountModel.prototype.reports     = function (store = 'all', from, to, client = 'all') {
+AccountModel.prototype.reports         = function (store = 'all', from, to, client = 'all') {
         return new Promise((resolve, reject) => {
                 let matchingObject = {$match: {timestamp: {$gte: from, $lte: to}}};
                 if (store !== 'all') {
@@ -245,7 +245,7 @@ AccountModel.prototype.reports     = function (store = 'all', from, to, client =
                 });
         });
 };
-AccountModel.prototype.reportsXLSX = function (store = 'all', from, to, client = 'all') {
+AccountModel.prototype.reportsXLSX     = function (store = 'all', from, to, client = 'all') {
         return new Promise((resolve, reject) => {
                 this.reports(store, Number(from), Number(to), client).then(data => {
                         console.log(data.length);
@@ -265,12 +265,12 @@ AccountModel.prototype.reportsXLSX = function (store = 'all', from, to, client =
                                 let unit       = sale.account.unit;
                                 let priceUnit  = sale.account.price;
                                 let overallSum = sale.overallSum;
-                                let customer = "";
+                                let customer   = '';
                                 if (sale.customer) {
-                                          customer = sale.customer.name;
+                                        customer = sale.customer.name;
                                 }
 
-                                let date       = new Date(sale.timestamp).toLocaleString('ru');
+                                let date = new Date(sale.timestamp).toLocaleString('ru');
 
                                 let rowdata = [name, oemNumber, count, unit, priceUnit, overallSum, customer, date];
                                 xlsxData.push(rowdata);
@@ -283,7 +283,45 @@ AccountModel.prototype.reportsXLSX = function (store = 'all', from, to, client =
                 });
         });
 };
+AccountModel.prototype.balanceXLSX     = function (query) {
+        return new Promise((resolve, reject) => {
+                this.balance(query).then(data => {
+                        console.log(data.length);
+                        let xlsxData = [];
+                        let title    = [
+                                'Наименование', 'OEM Номер', 'Количество', 'Единица', 'Цена за единицу', 'Цена',  'Время добавления'
+                        ];
 
+                        const fileName = 'base';
+                        xlsxData.push(title);
+
+                        for (let i = 0; i < data.length; i++) {
+                                let account       = data[i];
+                                let name       = account.name;
+                                let oemNumber  = account.oemNumber;
+                                let count      = account.count;
+                                let unit       = account.unit;
+                                let priceUnit  = account.price;
+                                let overallSum = account.overallSum;
+                                let date = '';
+
+                                if (account.timestamp) {
+                                        date = new Date(account.timestamp).toLocaleString('ru');
+                                }
+
+                                let rowdata = [name, oemNumber, count, unit, priceUnit, overallSum, date];
+                                xlsxData.push(rowdata);
+                        }
+                        console.log(xlsxData.length);
+
+                        this.createExcelFile(xlsxData, fileName, true).then(data => {
+                                resolve(data);
+                        });
+                });
+        });
+
+
+};
 AccountModel.prototype.createExcelFile = function (data, apendName, createFile = true) {
         return new Promise((resolve, reject) => {
                 let XLSX              = require('xlsx');
