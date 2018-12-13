@@ -120,6 +120,95 @@ router.post('/add', function (req, res) {
                 Response.ErrorWithCodeAndMessage(res, -1, err);
         });
 });
+
+/**
+ * @api {post} /goods/verify  Request Verify Goods
+ * @apiName VerifyGood
+ * @apiGroup Goods
+ *
+ * @apiParam {Account} accounts         Array of account data
+ * @apiParam {Number} status          Status to update
+ *
+ * @apiSuccess {Boolean} data Boolean indicating update result.
+ * @apiSuccess {Object} meta Common response message.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "data": true,
+ *       "meta": {
+ *              "code": 0,
+ *              "message": "OK"
+ *       }
+ *     }
+ *
+ */
+router.post('/verify', function (req, res) {
+        let accounts = req.body.accounts;
+        let status   = Number(req.body.status);
+        if (!accounts) {
+                Response.ErrorWithCodeAndMessage(res, -1, 'Accounts field is mandatory');
+        }
+        if (isNaN(status)) {
+                Response.ErrorWithCodeAndMessage(res, -1, 'Status field is mandatory');
+        }
+        let promises = [];
+        for (let i = 0; i < accounts.length; i++) {
+                let account    = accounts[i];
+                account.status = Number(status);
+                let promise    = AccountModel.updateAccount(account._id, account);
+                promises.push(promise);
+        }
+        Promise.all(promises).then(result => {
+                Response.setData(res, true);
+        }).catch(err => {
+                Response.ErrorWithCodeAndMessage(res, -1, err);
+        });
+});
+/**
+ * @api {get} /goods/prebalance/:status  Request Goods with status
+ * @apiName GoodsWithStatus
+ * @apiGroup Goods
+ *
+ * @apiParam {Number} status         Statuses: -2 Recently created, Moderator approve necessary. -1 Moderator approved, Admin approve necessary
+ *
+ * @apiSuccess {Object} data Accounts list.
+ * @apiSuccess {Object} meta Common response message.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "data": [{Account}],
+ *       "meta": {
+ *              "code": 0,
+ *              "message": "OK"
+ *       }
+ *     }
+ *
+ * @apiUse UNHANDLED_ERROR
+ * @apiError Status param <code>status</code> is mandatory
+ * @apiErrorExample UpdateAccountIDError:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "meta": {
+ *              "code": -1,
+ *              "message": "Field `accountID`  is mandatory"
+ *       }
+ *     }
+ */
+router.get('/prebalance/:status', function (req, res) {
+        let status = Number(req.params.status);
+        if (isNaN(status)) {
+                return Response.ErrorWithCodeAndMessage(res, -1, 'Status param is mandatory');
+        }
+        AccountModel.getAccountsWithStatus(status).then(result => {
+                Response.setData(res, result);
+        }).catch(err => {
+                Response.ErrorWithCodeAndMessage(res, -1, err);
+        });
+});
+
+
 /**
  * @api {post} /goods/update/  Request Update Good
  * @apiName UpdateGood
@@ -464,7 +553,7 @@ router.get('/reports-xlsx/:store_id/:client_id/:from/:to', function (req, res) {
  */
 router.post('/search', function (req, res) {
         const query = req.body.search;
-        let store = req.body.store;
+        let store   = req.body.store;
         if (!query) {
                 return Response.setData(res, []);
         }

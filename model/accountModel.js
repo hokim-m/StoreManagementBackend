@@ -35,6 +35,7 @@ AccountModel.prototype.parseXLSX = function (binary, store) {
                         account.unit        = worksheetValueOrDefault(worksheet['E' + current_row], '');
                         account.description = worksheetValueOrDefault(worksheet['F' + current_row], '');
                         account.store       = store;
+                        account.status = -2;
                         promises.push(this.addAccount(account));
 
                         current_row++;
@@ -48,7 +49,7 @@ AccountModel.prototype.parseXLSX = function (binary, store) {
         });
 };
 
-AccountModel.prototype.addAccount    = function (accountObject) {
+AccountModel.prototype.addAccount            = function (accountObject) {
         return new Promise((resolve, reject) => {
                 if (!accountObject.store) {
                         reject('store property is mandatory!');
@@ -68,7 +69,7 @@ AccountModel.prototype.addAccount    = function (accountObject) {
         });
 
 };
-AccountModel.prototype.sellAccount   = function (accountId, accountObject) {
+AccountModel.prototype.sellAccount           = function (accountId, accountObject) {
         return new Promise((resolve, reject) => {
                 let count            = accountObject.count;
                 let accountCountSell = Number(accountObject.count);
@@ -111,7 +112,25 @@ AccountModel.prototype.sellAccount   = function (accountId, accountObject) {
                 });
         });
 };
-AccountModel.prototype.updateAccount = function (accountId, accountObject) {
+AccountModel.prototype.getAccountsWithStatus = function (status) {
+        return new Promise((resolve, reject) => {
+                AccountsCollection.find({status: status}, function (err, accounts) {
+                        if (!err) {
+                                let existingAccounts = [];
+                                for (let i = 0; i < accounts.length; i++) {
+                                        let cAccount = accounts[i];
+                                        if (cAccount.count > 0) {
+                                                existingAccounts.push(cAccount);
+                                        }
+                                }
+                                resolve(existingAccounts);
+                        } else {
+                                reject(err);
+                        }
+                });
+        });
+};
+AccountModel.prototype.updateAccount         = function (accountId, accountObject) {
         return new Promise((resolve, reject) => {
                 let updatingObject = {$set: {}};
                 Object.keys(accountObject).map(key => {
@@ -136,7 +155,7 @@ AccountModel.prototype.updateAccount = function (accountId, accountObject) {
                 });
         });
 };
-AccountModel.prototype.balance       = function (query = {}) {
+AccountModel.prototype.balance               = function (query = {}) {
         return new Promise((resolve, reject) => {
                 AccountsCollection.find(query, function (err, accounts) {
                         if (!err) {
@@ -289,21 +308,21 @@ AccountModel.prototype.balanceXLSX     = function (query) {
                         console.log(data.length);
                         let xlsxData = [];
                         let title    = [
-                                'Наименование', 'OEM Номер', 'Количество', 'Единица', 'Цена за единицу', 'Цена',  'Время добавления'
+                                'Наименование', 'OEM Номер', 'Количество', 'Единица', 'Цена за единицу', 'Цена', 'Время добавления'
                         ];
 
                         const fileName = 'base';
                         xlsxData.push(title);
 
                         for (let i = 0; i < data.length; i++) {
-                                let account       = data[i];
+                                let account    = data[i];
                                 let name       = account.name;
                                 let oemNumber  = account.oemNumber;
                                 let count      = account.count;
                                 let unit       = account.unit;
                                 let priceUnit  = account.price;
                                 let overallSum = account.overallSum;
-                                let date = '';
+                                let date       = '';
 
                                 if (account.timestamp) {
                                         date = new Date(account.timestamp).toLocaleString('ru');
