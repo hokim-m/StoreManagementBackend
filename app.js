@@ -8,6 +8,7 @@ let usersRouter    = require('./routes/users');
 let accountsRouter = require('./routes/accounts');
 let storeRouter    = require('./routes/store');
 let customerRouter = require('./routes/customers');
+let expensesRouter = require('./routes/expenses');
 const os           = require('os');
 let app            = express();
 const cors         = require('cors');
@@ -36,6 +37,7 @@ app.use('/accounts', accountsRouter);
 app.use('/goods', accountsRouter);
 app.use('/store', storeRouter);
 app.use('/customers', customerRouter);
+app.use('/expenses', expensesRouter);
 
 
 app.use('/v1/documentation', function (req, res) {
