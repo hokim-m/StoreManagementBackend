@@ -126,7 +126,7 @@ router.post('/edit', function (req, res) {
  *       }
  *     }
  */
-router.get('/remove', function (req, res) {
+router.get('/remove/:customerID', function (req, res) {
         let customerID = req.params.customerID;
         CustomerModel.remove(customerID).then(data=> {
                 Response.setData(res, data);
