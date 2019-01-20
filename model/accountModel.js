@@ -27,14 +27,16 @@ AccountModel.prototype.parseXLSX = function (binary, store) {
                 };
                 let current_row             = 6;
                 while (!!worksheet['A' + current_row]) {
-                        let account         = {};
+                        let account       = {};
                         // account.oe     = worksheet['A' + current_row].v;
-                        account.oemNumber   = worksheetValueOrDefault(worksheet['B' + current_row], '');
-                        account.modelName   = worksheetValueOrDefault(worksheet['C' + current_row], '');
-                        account.name        = worksheetValueOrDefault(worksheet['D' + current_row], '');
-                        account.unit        = worksheetValueOrDefault(worksheet['E' + current_row], '');
-                        account.description = worksheetValueOrDefault(worksheet['F' + current_row], '');
-                        account.store       = store;
+                        account.model     = worksheetValueOrDefault(worksheet['A' + current_row], '');
+                        account.name      = worksheetValueOrDefault(worksheet['B' + current_row], '');
+                        account.oemNumber = worksheetValueOrDefault(worksheet['C' + current_row], '');
+                        account.unit      = worksheetValueOrDefault(worksheet['D' + current_row], '');
+                        account.price     = Number(worksheetValueOrDefault(worksheet['E' + current_row], 0));
+                        account.count     = Number(worksheetValueOrDefault(worksheet['F' + current_row], 0));
+
+                        account.store  = store;
                         account.status = -2;
                         promises.push(this.addAccount(account));
 
@@ -270,7 +272,7 @@ AccountModel.prototype.reportsXLSX     = function (store = 'all', from, to, clie
                         console.log(data.length);
                         let xlsxData = [];
                         let title    = [
-                                'Наименование', 'OEM Номер', 'Кол-во', 'Единица', 'Цена за единицу', 'Итоговая сумма', 'Клиент', 'Время продажи'
+                                'ГРУППА / Item\'s model', 'НАИМЕНОВАНИЕ / Product name', 'АТИКУЛ / Code', 'O`lchov birligi / Product unit', 'Narxi / Price for unit', 'SONI / Quantity', 'JAMI / Total amount', 'Клиент / Customer', 'Время продажи / Sold time'
                         ];
 
                         const fileName = 'base';
@@ -278,6 +280,7 @@ AccountModel.prototype.reportsXLSX     = function (store = 'all', from, to, clie
 
                         for (let i = 0; i < data.length; i++) {
                                 let sale       = data[i];
+                                let model      = sale.account.model;
                                 let name       = sale.account.name;
                                 let oemNumber  = sale.account.oemNumber;
                                 let count      = sale.count;
@@ -291,7 +294,7 @@ AccountModel.prototype.reportsXLSX     = function (store = 'all', from, to, clie
 
                                 let date = new Date(sale.timestamp).toLocaleString('ru');
 
-                                let rowdata = [name, oemNumber, count, unit, priceUnit, overallSum, customer, date];
+                                let rowdata = [model, name, oemNumber, unit, priceUnit, count, overallSum, customer, date];
                                 xlsxData.push(rowdata);
                         }
                         console.log(xlsxData.length);
